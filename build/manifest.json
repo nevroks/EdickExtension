@@ -1,10 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "React Chrome Extension",
+  "name": "EdickExt",
   "version": "1.0.0",
   "description": "A simple React app as a Chrome extension",
   "action": {
     "default_popup": "index.html"
   },
-  "permissions": []
+  "permissions": [
+    "storage"
+  ]
 }
