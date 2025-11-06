@@ -8,5 +8,12 @@
   },
   "permissions": [
     "storage"
-  ]
+  ],
+  "host_permissions": [
+    "https://invest-public-api.tinkoff.ru/*",
+    "https://api-invest.tinkoff.ru/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://invest-public-api.tinkoff.ru https://api-invest.tinkoff.ru"
+  }
 }

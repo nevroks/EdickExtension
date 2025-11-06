@@ -1,0 +1,1 @@
+export const TINKOFF_API_URL = 'https://invest-public-api.tinkoff.ru/rest'
