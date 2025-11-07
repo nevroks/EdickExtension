@@ -14,22 +14,23 @@ export default defineConfig({
   },
   build: {
     outDir: 'build',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         popup: './index.html',
-        // options: './options.html',
-        // background: './src/background/background.ts',
-        // content: './src/content/content.ts',
+        background: './src/background/background.js',
+        'tinkoff-integration': './src/content/tinkoff-integration.js',
       },
       output: {
         entryFileNames: (chunkInfo) => {
-          // Для background и content скриптов сохраняем как .js
-          if (chunkInfo.name === 'background' || chunkInfo.name === 'content') {
+          // Все content scripts и background должны быть в корне
+          if (['background', 'tinkoff-integration'].includes(chunkInfo.name)) {
             return '[name].js'
           }
-          // Для остальных - стандартное именование
+          // Для popup - стандартная структура
           return 'assets/[name]-[hash].js'
-        }
+        },
+        assetFileNames: 'assets/[name]-[hash][extname]'
       }
     },
   },

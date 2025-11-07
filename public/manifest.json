@@ -2,18 +2,37 @@
   "manifest_version": 3,
   "name": "EdickExt",
   "version": "1.0.0",
-  "description": "A simple React app as a Chrome extension",
+  "description": "Tinkoff investments tracker with terminal integration",
   "action": {
     "default_popup": "index.html"
   },
   "permissions": [
-    "storage"
+    "scripting",
+    "storage",
+    "activeTab"
   ],
   "host_permissions": [
     "https://invest-public-api.tinkoff.ru/*",
-    "https://api-invest.tinkoff.ru/*"
+    "https://api-invest.tinkoff.ru/*",
+    "https://*.tinkoff.ru/*",
+    "https://*.tbank.ru/*"
   ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.tinkoff.ru/terminal/*",
+        "https://*.tbank.ru/terminal/*"
+      ],
+      "js": [
+        "tinkoff-integration.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://invest-public-api.tinkoff.ru https://api-invest.tinkoff.ru"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

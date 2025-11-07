@@ -1,0 +1,13 @@
+.edickext-widget {
+  font-family: 'Tinkoff Sans', sans-serif;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.edickext-widget h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-weight: 600;
+}
