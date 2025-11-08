@@ -1,6 +1,8 @@
 // Background script for EdickExt
 console.log('EdickExt: Background script loaded');
 
+const registeredTabs = new Set();
+
 // Обработчик установки
 chrome.runtime.onInstalled.addListener(() => {
   console.log('EdickExt: Extension installed');
@@ -8,24 +10,24 @@ chrome.runtime.onInstalled.addListener(() => {
   checkAllTerminalTabs();
 });
 
-// Автоматическая проверка при обновлении вкладки
-// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-//   if (changeInfo.status === 'complete' && isTerminalUrl(tab.url)) {
-//     console.log('🔍 EdickExt: Terminal page loaded automatically checking...', tab.url);
-
-//     // Даем странице время на загрузку
-
-//     checkTerminalAPI(tab);
-
-//   }
-// });
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && isTerminalUrl(tab.url)) {
+    console.log('🔍 EdickExt: Terminal page loaded or updated, checking...', tab.url);
+    
+    // Сбрасываем состояние для этой вкладки
+    registeredTabs.delete(tabId);
+    
+    // Даем странице больше времени на инициализацию Terminal API
+    setTimeout(async () => {
+      await checkTerminalAPI(tab);
+    }, 5000); // Увеличил задержку
+  }
+});
 
 // Проверяем все уже открытые вкладки с терминалом
 async function checkAllTerminalTabs() {
   const tabs = await chrome.tabs.query({});
   for (const tab of tabs) {
-    console.log("intab");
-
     if (isTerminalUrl(tab.url)) {
       console.log('🔍 EdickExt: Checking existing terminal tab:', tab.url);
       setTimeout(async () => {
@@ -34,6 +36,10 @@ async function checkAllTerminalTabs() {
     }
   }
 }
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  registeredTabs.delete(tabId);
+});
 
 // Проверяем является ли URL терминалом
 function isTerminalUrl(url) {
@@ -48,7 +54,13 @@ function isTerminalUrl(url) {
 // Функция проверки Terminal API
 async function checkTerminalAPI(tab) {
   try {
-    console.log('🔍 Checking terminal API...');
+    // Проверяем не зарегистрировано ли уже расширение для этой вкладки
+    if (registeredTabs.has(tab.id)) {
+      console.log('✅ EdickExt: Already registered for tab', tab.id);
+      return;
+    }
+
+    console.log('🔍 Checking terminal API for tab', tab.id);
 
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -57,26 +69,37 @@ async function checkTerminalAPI(tab) {
     });
 
     if (results[0].result.found) {
-      console.log('✅ Terminal API found!');
+      console.log('✅ Terminal API found for tab', tab.id);
       await registerExtension(tab);
     } else {
-      console.log('❌ Terminal API not found, retrying...');
+      console.log('❌ Terminal API not found for tab', tab.id + ', retrying...');
       setTimeout(() => retryTerminalCheck(tab), 5000);
     }
 
   } catch (error) {
-    console.error('❌ Check error:', error);
+    console.error('❌ Check error for tab', tab.id + ':', error);
   }
 }
 
 // Повторная проверка с несколькими попытками
 async function retryTerminalCheck(tab) {
+  // Если уже зарегистрированы, выходим
+  if (registeredTabs.has(tab.id)) {
+    return;
+  }
+
   let attempts = 0;
-  const maxAttempts = 10;
+  const maxAttempts = 12; // Увеличил количество попыток
 
   const checkInterval = setInterval(async () => {
+    // Если зарегистрировались в другом месте, выходим
+    if (registeredTabs.has(tab.id)) {
+      clearInterval(checkInterval);
+      return;
+    }
+
     attempts++;
-    console.log(`🔄 Attempt ${attempts}/${maxAttempts}`);
+    console.log(`🔄 Attempt ${attempts}/${maxAttempts} for tab ${tab.id}`);
 
     try {
       const results = await chrome.scripting.executeScript({
@@ -87,14 +110,14 @@ async function retryTerminalCheck(tab) {
 
       if (results[0].result.found) {
         clearInterval(checkInterval);
-        console.log('✅ Terminal API found on attempt', attempts);
+        console.log('✅ Terminal API found on attempt', attempts, 'for tab', tab.id);
         await registerExtension(tab);
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
-        console.log('❌ Terminal API not found after', maxAttempts, 'attempts');
+        console.log('❌ Terminal API not found after', maxAttempts, 'attempts for tab', tab.id);
       }
     } catch (error) {
-      console.error('❌ Check attempt failed:', error);
+      console.error('❌ Check attempt failed for tab', tab.id + ':', error);
       if (attempts >= maxAttempts) clearInterval(checkInterval);
     }
   }, 1000);
@@ -104,19 +127,21 @@ async function retryTerminalCheck(tab) {
 function checkForTerminal() {
   console.log('🔍 EdickExt: Auto-checking window.terminal in PAGE context...');
 
-  if (window.terminal) {
+  // Более тщательная проверка Terminal API
+  const terminal = window.terminal;
+  if (terminal && typeof terminal.registerExtension === 'function') {
     console.log('✅ Terminal API available in auto-check!');
     return {
       found: true,
-      terminal: '[Object]', // Не отправляем весь объект чтобы избежать ошибок
-      keys: Object.keys(window.terminal),
-      hasRegisterExtension: typeof window.terminal.registerExtension === 'function'
+      terminal: '[Object]',
+      keys: Object.keys(terminal),
+      hasRegisterExtension: true
     };
   } else {
     console.log('❌ No terminal API found in auto-check');
     return {
       found: false,
-      reason: 'window.terminal is undefined'
+      reason: 'window.terminal is undefined or missing registerExtension'
     };
   }
 }
@@ -124,7 +149,10 @@ function checkForTerminal() {
 // Функция регистрации расширения
 async function registerExtension(tab) {
   try {
-    console.log('🚀 EdickExt: Auto-registering extension...');
+    // Помечаем вкладку как обрабатываемую
+    registeredTabs.add(tab.id);
+    
+    console.log('🚀 EdickExt: Auto-registering extension for tab', tab.id);
 
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -132,16 +160,21 @@ async function registerExtension(tab) {
       world: 'MAIN'
     });
 
-    console.log('📡 EdickExt: Auto-registration results:', results);
+    console.log('📡 EdickExt: Auto-registration results for tab', tab.id + ':', results);
 
     if (results[0].result.success) {
       await showNotification(tab, 'EdickExt: Автоматически зарегистрирован! 🎉');
+      console.log('✅ EdickExt: Successfully registered for tab', tab.id);
     } else {
-      console.log('❌ EdickExt: Auto-registration failed:', results[0].result.error);
+      console.log('❌ EdickExt: Auto-registration failed for tab', tab.id + ':', results[0].result.error);
+      // Если регистрация не удалась, разрешаем повторную попытку
+      registeredTabs.delete(tab.id);
     }
 
   } catch (error) {
-    console.error('❌ EdickExt: Auto-registration error:', error);
+    console.error('❌ EdickExt: Auto-registration error for tab', tab.id + ':', error);
+    // При ошибке разрешаем повторную попытку
+    registeredTabs.delete(tab.id);
   }
 }
 
