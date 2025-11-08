@@ -9,21 +9,23 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Автоматическая проверка при обновлении вкладки
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && isTerminalUrl(tab.url)) {
-    console.log('🔍 EdickExt: Terminal page loaded automatically checking...', tab.url);
+// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+//   if (changeInfo.status === 'complete' && isTerminalUrl(tab.url)) {
+//     console.log('🔍 EdickExt: Terminal page loaded automatically checking...', tab.url);
 
-    // Даем странице время на загрузку
+//     // Даем странице время на загрузку
 
-    checkTerminalAPI(tab);
+//     checkTerminalAPI(tab);
 
-  }
-});
+//   }
+// });
 
 // Проверяем все уже открытые вкладки с терминалом
 async function checkAllTerminalTabs() {
   const tabs = await chrome.tabs.query({});
   for (const tab of tabs) {
+    console.log("intab");
+
     if (isTerminalUrl(tab.url)) {
       console.log('🔍 EdickExt: Checking existing terminal tab:', tab.url);
       setTimeout(async () => {
@@ -46,31 +48,24 @@ function isTerminalUrl(url) {
 // Функция проверки Terminal API
 async function checkTerminalAPI(tab) {
   try {
-    console.log('🔍 EdickExt: Auto-checking terminal API for tab:', tab.url);
+    console.log('🔍 Checking terminal API...');
 
-    // Выполняем код в контексте страницы
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: checkForTerminal,
       world: 'MAIN'
     });
 
-    console.log('📡 EdickExt: Auto-check results:', results);
-
     if (results[0].result.found) {
-      console.log('✅ EdickExt: Terminal API found automatically!');
+      console.log('✅ Terminal API found!');
       await registerExtension(tab);
     } else {
-      console.log('❌ EdickExt: Terminal API not found in auto-check');
-      // Пробуем еще раз через 5 секунд (на случай медленной загрузки)
-      setTimeout(async () => {
-        console.log('🔄 EdickExt: Retrying auto-check...');
-        await retryTerminalCheck(tab);
-      }, 5000);
+      console.log('❌ Terminal API not found, retrying...');
+      setTimeout(() => retryTerminalCheck(tab), 5000);
     }
 
   } catch (error) {
-    console.error('❌ EdickExt: Auto-check error:', error);
+    console.error('❌ Check error:', error);
   }
 }
 
@@ -81,7 +76,7 @@ async function retryTerminalCheck(tab) {
 
   const checkInterval = setInterval(async () => {
     attempts++;
-    console.log(`🔄 EdickExt: Auto-check attempt ${attempts}/${maxAttempts}`);
+    console.log(`🔄 Attempt ${attempts}/${maxAttempts}`);
 
     try {
       const results = await chrome.scripting.executeScript({
@@ -92,17 +87,15 @@ async function retryTerminalCheck(tab) {
 
       if (results[0].result.found) {
         clearInterval(checkInterval);
-        console.log('✅ EdickExt: Terminal API found on attempt', attempts);
+        console.log('✅ Terminal API found on attempt', attempts);
         await registerExtension(tab);
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
-        console.log('❌ EdickExt: Terminal API not found after', maxAttempts, 'attempts');
+        console.log('❌ Terminal API not found after', maxAttempts, 'attempts');
       }
     } catch (error) {
-      console.error('❌ EdickExt: Auto-check attempt failed:', error);
-      if (attempts >= maxAttempts) {
-        clearInterval(checkInterval);
-      }
+      console.error('❌ Check attempt failed:', error);
+      if (attempts >= maxAttempts) clearInterval(checkInterval);
     }
   }, 1000);
 }
@@ -154,83 +147,156 @@ async function registerExtension(tab) {
 
 // Функция регистрации в контексте страницы
 function registerInPageContext() {
-  try {
-    console.log('🎯 EdickExt: Registering with NEW API...');
+  return new Promise((resolve) => { // ⚡ ОБЕРНУЛИ В PROMISE
+    try {
+      console.log('🎯 EdickExt: Registering with NEW API...');
 
-    if (!window.terminal?.registerExtension) {
-      return { success: false, error: 'Terminal API not available' };
-    }
-    console.log(window.terminal);
+      if (!window.terminal?.registerExtension) {
+        resolve({ success: false, error: 'Terminal API not available' });
+        return;
+      }
 
-    // Глобальная проверка чтобы не регистрировать дважды
-    if (window._edickExtRegistered) {
-      console.log('✅ EdickExt: Already registered');
-      return { success: true, alreadyRegistered: true };
-    }
+      // ТОЛЬКО НОВЫЙ API
+      window.terminal.registerExtension({
+        extensionName: 'EDICK_EXTENSION',
+        displayName: 'EdickExt - Аналитика'
+      }).then(extension => {
 
-    // ТОЛЬКО НОВЫЙ API
-    window.terminal.registerExtension({
-      extensionName: 'EDICK_EXTENSION',
-      displayName: 'EdickExt - Аналитика'
-    }).then(extension => {
-      extension.registerWidgetType('bond-analyzer', {
-        layout: {
-          width: 400,
-          height: 300
-        },
-        settings: {
-          title: 'Анализ облигаций',
-          searchable: true,
-          symbolRequired: false,
-          noGroup: false,
-          fullscreenAllowed: true,        // ⚡ ДОБАВИЛ
-          isSymbolResettingWithGroup: false, // ⚡ ДОБАВИЛ
-          useSymbolInTitle: false,
-          pinnable: true
-        },
-        menu: {
-          icon: '💰',
-          label: 'Облигации EdickExt',
-          order: 1,                       // ⚡ ДОБАВИЛ
-          hint: 'Анализ облигаций'        // ⚡ ДОБАВИЛ
-        },
-        // ПРАВИЛЬНЫЕ handlers
-        handlers: {
-          mount: (widget) => {
-            console.log('🔧 Widget mounted:', widget);
-            widget.container.innerHTML = `
-            <div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; height: 100%;">
-              <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
-              <p style="margin: 0 0 8px 0;">Анализ облигаций</p>
-              <p style="margin: 0; font-size: 12px; opacity: 0.8;">Новый API работает!</p>
-            </div>
-          `;
+        console.log("Etension:", extension);
+
+        // console.log(extension.getWidgetTypes());
+
+        extension.registerWidgetType('bond-analyzer', {
+          layout: {
+            width: 400,
+            height: 300
           },
-          unmount: (widget) => {
-            console.log('🔧 Widget unmounted:', widget);
+          settings: {
+            title: 'Анализ облигаций',
+            searchable: true,
+            symbolRequired: false,
+            noGroup: false,
+            fullscreenAllowed: true,        // ⚡ ДОБАВИЛ
+            isSymbolResettingWithGroup: false, // ⚡ ДОБАВИЛ
+            useSymbolInTitle: false,
+            pinnable: true
           },
-          tickerChange: (widget, oldTicker) => {
-            console.log('🔧 Ticker changed:', oldTicker, '->', widget.ticker);
+          menu: {
+            icon: 'chart',
+            label: 'Облигации EdickExt',
+            order: 1,                       // ⚡ ДОБАВИЛ
+            hint: 'Анализ облигаций'        // ⚡ ДОБАВИЛ
+          },
+          // ПРАВИЛЬНЫЕ handlers
+          handlers: {
+            mount: (widget) => {
+              console.log(widget);
+
+              console.log('Настройки:', widget.getCommonSettings?.());
+
+              // БЕЗОПАСНЫЙ подход - используем requestAnimationFrame и проверки
+              const safeRender = () => {
+                try {
+                  // Ищем контейнер безопасно
+                  let container = widget.contentRef || widget.container;
+
+                  if (!container) {
+                    console.warn('❌ Container not found, retrying...');
+                    setTimeout(safeRender, 100);
+                    return;
+                  }
+
+                  // Проверяем что контейнер все еще в DOM
+                  if (!document.body.contains(container)) {
+                    console.warn('❌ Container not in DOM');
+                    return;
+                  }
+
+                  // СОЗДАЕМ новый элемент вместо innerHTML
+                  const newContent = document.createElement('div');
+                  newContent.style.cssText = `
+                    padding: 20px; 
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    color: white; 
+                    border-radius: 8px; 
+                    height: 100%;
+                    box-sizing: border-box;
+                  `;
+                  newContent.innerHTML = `
+                    <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
+                    <p style="margin: 0 0 8px 0;">Анализ облигаций</p>
+                    <p style="margin: 0; font-size: 12px; opacity: 0.8;">Безопасный рендеринг!</p>
+                  `;
+
+                  // ОЧИСТКА через безопасный метод
+                  while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                  }
+
+                  // ДОБАВЛЯЕМ новый контент
+                  container.appendChild(newContent);
+
+                  console.log('✅ Widget content rendered safely');
+
+                } catch (error) {
+                  console.error('❌ Safe render error:', error);
+                }
+              };
+
+              // Запускаем с задержкой чтобы DOM успел стабилизироваться
+              setTimeout(safeRender, 50);
+            },
+
+            unmount: (widget) => {
+              console.log('🔧 Widget unmounted:', widget);
+              // Безопасная очистка
+              try {
+                const container = widget.contentRef || widget.container;
+                if (container && document.body.contains(container)) {
+                  while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                  }
+                }
+              } catch (error) {
+                console.error('❌ Safe unmount error:', error);
+              }
+            },
+
+            tickerChange: (widget, oldTicker) => {
+              console.log(widget);
+              
+              console.log('🔧 Ticker changed:', oldTicker, '->', widget.ticker);
+            },
+            groupChange: (widget, oldGroup) => {
+              console.log('🎯 Group changed:', oldGroup, '→', widget.group);
+            },
+            onCurrencyChange: (widget, oldCurrency) => {
+              console.log('🎯 Currency changed:', oldCurrency, '→', widget.currency);
+            }
           }
+
+        });
+
+        console.log('✅ EdickExt: Successfully registered with new API');
+
+        resolve({ success: true }); // ⚡ RESOLVE PROMISE
+
+      }).catch(error => {
+        if (error.message.includes('already registered')) {
+          console.log('✅ EdickExt: Already registered (caught)');
+
+          resolve({ success: true, alreadyRegistered: true });
+        } else {
+          console.error('❌ Registration failed:', error);
+          resolve({ success: false, error: error.message });
         }
       });
-    });
 
-    console.log('✅ EdickExt: Successfully registered with new API');
-
-    window._edickExtRegistered = true;
-    return { success: true };
-
-  } catch (error) {
-    if (error.message.includes('already registered')) {
-      console.log('✅ EdickExt: Already registered (caught)');
-      window._edickExtRegistered = true;
-      return { success: true, alreadyRegistered: true };
+    } catch (error) {
+      console.error('❌ Registration failed:', error);
+      resolve({ success: false, error: error.message });
     }
-
-    console.error('❌ Registration failed:', error);
-    return { success: false, error: error.message };
-  }
+  });
 }
 
 // Функция показа уведомления
