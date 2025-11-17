@@ -4,6 +4,8 @@ import { Button, FormField, Link } from "@/ui";
 import { AnimatePresence, motion, type Variants } from "motion/react";
 import LoginForm from "./ScreenComponents/LoginForm";
 import RegisterForm from "./ScreenComponents/RegisterForm";
+import type { LoginDto, RegisterDto } from "@/utils/api/authApi/AuthApi";
+import useAuthApi from "@/utils/hooks/useAuthApi";
 
 
 const formVariants: Variants = {
@@ -23,6 +25,24 @@ const AuthScreen = () => {
     const [formMode, setFormMode] = useState<'login' | 'register'>('login')
 
 
+    const { mutations: {
+        register: { mutateAsync: registerFunc },
+        login: { mutateAsync: loginFunc }
+    } } = useAuthApi()
+
+    const handleRegister = (dto: RegisterDto) => {
+        registerFunc(dto).then(data => {
+            console.log(data);
+
+        })
+    }
+
+    const handleLogin = (dto: LoginDto) => {
+        loginFunc(dto).then(data => {
+            console.log(data);
+
+        })
+    }
 
 
 
@@ -42,9 +62,9 @@ const AuthScreen = () => {
             >
                 <AnimatePresence mode="wait">
                     {formMode === 'login' ? (
-                        <LoginForm setFormMode={setFormMode} onSuccessSubmit={(data) => { console.log(data) }} />
+                        <LoginForm setFormMode={setFormMode} onSuccessSubmit={handleLogin} />
                     ) : (
-                        <RegisterForm setFormMode={setFormMode} onSuccessSubmit={(data) => { console.log(data) }} />
+                        <RegisterForm setFormMode={setFormMode} onSuccessSubmit={handleRegister} />
                     )}
                 </AnimatePresence>
             </motion.div>

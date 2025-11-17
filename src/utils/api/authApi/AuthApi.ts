@@ -2,7 +2,7 @@ import { APP_BACKEND_URL } from "@/utils/consts/appConsts";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 
-type LoginDto = {
+export type LoginDto = {
     email: string,
     password: string
 }
@@ -17,10 +17,20 @@ type LoginResponse = {
     };
 }
 
-type RegisterDto = {
+export type RegisterDto = {
     firstName: string,
     email: string,
     password: string
+}
+
+type RegisterResponse = {
+    accessToken: string;
+    refreshToken: string;
+    user: {
+        id: number;
+        firstName: string;
+        email: string;
+    };
 }
 
 export class AuthApi {
@@ -45,9 +55,13 @@ export class AuthApi {
             throw error
         }
     }
-    async register() {
+    async register(dto: RegisterDto) {
         try {
-            const { data } = await this.api.post(`/register`, {})
+            const { data } = await this.api.post<RegisterResponse>(`/register`, {
+                email: dto.email,
+                password: dto.password,
+                firstName: dto.firstName
+            })
             return data
         } catch (error) {
             throw error

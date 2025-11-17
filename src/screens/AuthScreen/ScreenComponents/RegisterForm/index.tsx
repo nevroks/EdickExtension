@@ -4,10 +4,11 @@ import { motion } from "motion/react";
 import { Button, FormField } from "@/ui";
 import styles from "./style.module.css"
 import classNames from "classnames";
+import type { RegisterDto } from "@/utils/api/authApi/AuthApi";
 
 
 type RegisterFormProps = {
-    onSuccessSubmit: ({ login, password }: { login: string, password: string }) => void
+    onSuccessSubmit: (dto: RegisterDto) => void
     setFormMode: Dispatch<SetStateAction<'login' | 'register'>>
 }
 
@@ -67,7 +68,11 @@ const RegisterForm = ({ onSuccessSubmit, setFormMode }: RegisterFormProps) => {
             return;
         }
 
-        onSuccessSubmit(registerDto)
+        onSuccessSubmit({
+            email: registerDto.email,
+            password: registerDto.password,
+            firstName: registerDto.login
+        })
     }
 
     return (

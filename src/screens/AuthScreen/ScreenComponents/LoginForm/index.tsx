@@ -5,10 +5,11 @@ import { contentVariants } from "../..";
 import styles from "./style.module.css"
 import classNames from "classnames";
 import { emailRegex } from "../RegisterForm";
+import type { LoginDto } from "@/utils/api/authApi/AuthApi";
 
 
 type LoginFormProps = {
-    onSuccessSubmit: ({ email, password }: { email: string, password: string }) => void
+    onSuccessSubmit: (dto: LoginDto) => void
     setFormMode: Dispatch<SetStateAction<'login' | 'register'>>
 }
 
