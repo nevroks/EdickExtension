@@ -1,13 +1,14 @@
 import type { DetailedHTMLProps, InputHTMLAttributes } from "react";
 import styles from "./style.module.css";
+import classNames from "classnames";
 
-type TextInputPropsType = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
-
+export type TextInputPropsType = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+    variants?: "default" | "error"
 }
 
-const TextInput = ({ ...props }: TextInputPropsType) => {
+const TextInput = ({ variants = "default", ...props }: TextInputPropsType) => {
     return (
-        <input className={styles["TextInput"]} {...props} />
+        <input className={classNames(styles["TextInput"], styles[`TextInput-variant-${variants}`])} {...props} />
     );
 }
 

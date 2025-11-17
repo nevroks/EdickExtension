@@ -1,0 +1,37 @@
+.LoginForm-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.LoginForm-field-login {
+    margin-bottom: 11px;
+}
+
+.LoginForm-field-password {
+    margin-bottom: 13px;
+}
+
+.LoginForm-button {
+    width: 41px;
+    height: 17px;
+    margin-bottom: 13px;
+}
+
+.LoginForm-footer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    align-items: center;
+}
+.LoginForm-footer-register{
+    display: flex;
+    column-gap: 2px;
+}
+
+.LoginForm-linklike-text {
+    line-height: 10px;
+    letter-spacing: 0%;
+    cursor: pointer;
+    text-decoration-line: underline;
+}

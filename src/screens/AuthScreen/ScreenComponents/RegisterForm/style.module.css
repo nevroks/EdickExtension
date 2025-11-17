@@ -1,0 +1,31 @@
+.RegisterForm-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.RegisterForm-field {
+    margin-bottom: 11px;
+}
+
+.RegisterForm-field-email {
+    margin-bottom: 13px;
+}
+
+.RegisterForm-button {
+    width: 107px;
+    height: 17px;
+    margin-bottom: 10px;
+}
+
+.RegisterForm-footer {
+    display: flex;
+    column-gap: 4px;
+}
+
+.RegisterForm-linklike-text {
+    line-height: 10px;
+    letter-spacing: 0%;
+    cursor: pointer;
+    text-decoration-line: underline;
+}

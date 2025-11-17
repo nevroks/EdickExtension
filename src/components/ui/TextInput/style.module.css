@@ -1,0 +1,51 @@
+.TextInput {
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 11px;
+    color: rgba(207, 207, 207, 1);
+    caret-color: rgb(176, 3, 244); 
+
+    position: relative;
+
+    padding: 6px;
+
+    width: 100%;
+    border-radius: 6px;
+    background: rgba(21, 21, 21, 1);
+    box-shadow: 0px 4px 4.099999904632568px 0px rgba(0, 0, 0, 0.25);
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+.TextInput::placeholder {
+    color: rgba(85, 85, 85, 1);
+
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 11px;
+    
+    text-align: center;
+}
+
+/* .TextInput:focus {
+    background: rgba(16, 16, 16, 1);
+} */
+
+.TextInput-variant-default {}
+
+.TextInput-variant-default:focus {
+    background:
+        linear-gradient(rgba(21, 21, 21, 1), rgba(21, 21, 21, 1)) padding-box,
+        linear-gradient(90deg, rgba(35, 30, 37, 1), rgba(101, 9, 137, 1)) border-box;
+    border: 1px solid transparent;
+}
+
+.TextInput-variant-error {
+    background:
+        linear-gradient(rgba(21, 21, 21, 1), rgba(21, 21, 21, 1)) padding-box,
+        linear-gradient(90deg, rgba(48, 0, 1, 1), rgba(255, 0, 4, 1)) border-box;
+    border: 1px solid transparent;
+}
+
+.TextInput-variant-error:focus {}
+

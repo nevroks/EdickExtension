@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type View = 'main' | 'settings' | 'about' | 'profile';
+export type View = 'main' | 'settings' | 'about' | 'profile' | 'auth';
 
 export interface NavigationContextType {
     currentView: View;

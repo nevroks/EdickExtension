@@ -12,12 +12,13 @@ export type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonEleme
     children: ReactNode;
 }
 
-const Button = ({ children, variant = "default", style, disabled = false, ...props }: ButtonProps) => {
+const Button = ({ children, variant = "default", className, style, disabled = false, ...props }: ButtonProps) => {
 
     return (
         <ButtonContext.Provider value={{ disabled: disabled!, variant: variant }}>
             <button className={classNames(styles["Button"], styles[`Button-variant-${variant}`], {
-                [styles["Button-disabled"]]: disabled
+                [styles["Button-disabled"]]: disabled,
+                [className!]: Boolean(className)
             })} disabled={disabled} {...props}>
                 {children}
             </button>

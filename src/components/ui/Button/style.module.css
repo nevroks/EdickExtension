@@ -1,0 +1,21 @@
+.Button {
+    padding: 2px 6px;
+
+}
+
+.Button-variant-default {
+    border: 1px solid rgba(161, 54, 255, 0.63);
+    border-radius: 6px;
+    box-shadow: 0px 0px 5.400000095367432px 0px rgba(112, 45, 172, 0.77);
+}
+
+.ButtonText {
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 11px;
+}
+
+.ButtonText-variant-default {
+    color: rgba(132, 81, 152, 1);
+
+}
