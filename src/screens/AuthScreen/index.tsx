@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./style.module.css";
-import { Button, FormField, Link } from "@/ui";
+
 import { AnimatePresence, motion, type Variants } from "motion/react";
 import LoginForm from "./ScreenComponents/LoginForm";
 import RegisterForm from "./ScreenComponents/RegisterForm";

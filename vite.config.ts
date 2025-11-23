@@ -18,13 +18,13 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: './index.html',
-        background: './src/background/background.js',
-        'tinkoff-integration': './src/content/tinkoff-integration.js',
+        background: './src/background/background.ts',
+        content: './src/content/content.ts',
       },
       output: {
         entryFileNames: (chunkInfo) => {
           // Все content scripts и background должны быть в корне
-          if (['background', 'tinkoff-integration'].includes(chunkInfo.name)) {
+          if (['background', 'content'].includes(chunkInfo.name)) {
             return '[name].js'
           }
           // Для popup - стандартная структура
