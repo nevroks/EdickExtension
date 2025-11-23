@@ -24,5 +24,7 @@ dist-ssr
 *.sw?
 
 build
+build/*
+
 
 package-lock.json
