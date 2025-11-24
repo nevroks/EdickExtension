@@ -1,6 +1,6 @@
 import type { TabInfo } from "../extensionUtils/extensionTypes";
 import { isTerminalUrl, logInfo } from "../extensionUtils/helpers";
-import { RegistrationService } from "../extensionUtils/registration-manager";
+import { RegistrationService } from "../extensionUtils/registration-service";
 import { TabManager } from "../extensionUtils/tab-manager";
 import { TerminalChecker } from "../extensionUtils/terminal-checker";
 

@@ -3,10 +3,14 @@ export class TabManager {
 
   addTab(tabId: number): void {
     this.registeredTabs.add(tabId);
+    console.log(`📌 Tab ${tabId} added to registered tabs`);
   }
 
   removeTab(tabId: number): void {
-    this.registeredTabs.delete(tabId);
+    const wasRemoved = this.registeredTabs.delete(tabId);
+    if (wasRemoved) {
+      console.log(`🗑️ Tab ${tabId} removed from registered tabs`);
+    }
   }
 
   hasTab(tabId: number): boolean {
@@ -18,6 +22,11 @@ export class TabManager {
   }
 
   clear(): void {
+    console.log(`🧹 Clearing all ${this.registeredTabs.size} registered tabs`);
     this.registeredTabs.clear();
+  }
+
+  get size(): number {
+    return this.registeredTabs.size;
   }
 }
