@@ -16,78 +16,16 @@ export class RegistrationService {
       logInfo('Auto-registering extension for tab', tab.id);
 
       // Функция регистрации которая возвращает Promise
-      const registerFunction = function(): Promise<RegistrationResult> {
+      const registerFunction = function (): Promise<RegistrationResult> {
         return new Promise((resolve) => {
           try {
             console.log('🎯 EdickExt: Registering with NEW API...');
-            
+
             (window as any).terminal.registerExtension({
               extensionName: 'EDICK_EXTENSION',
               displayName: 'EdickExt - Аналитика'
             }).then((extension: any) => {
               console.log("Extension:", extension);
-
-              // Функция для безопасного рендеринга виджета
-              const renderWidget = (widget: any) => {
-                const safeRender = () => {
-                  try {
-                    let container = widget.contentRef || widget.container;
-                    
-                    if (!container) {
-                      console.warn('❌ Container not found, retrying...');
-                      setTimeout(safeRender, 100);
-                      return;
-                    }
-
-                    if (!document.body.contains(container)) {
-                      console.warn('❌ Container not in DOM');
-                      return;
-                    }
-
-                    const newContent = document.createElement('div');
-                    newContent.style.cssText = `
-                      padding: 20px; 
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                      color: white; 
-                      border-radius: 8px; 
-                      height: 100%;
-                      box-sizing: border-box;
-                    `;
-                    newContent.innerHTML = `
-                      <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
-                      <p style="margin: 0 0 8px 0;">Анализ облигаций</p>
-                      <p style="margin: 0; font-size: 12px; opacity: 0.8;">Работает!</p>
-                    `;
-
-                    while (container.firstChild) {
-                      container.removeChild(container.firstChild);
-                    }
-
-                    container.appendChild(newContent);
-                    console.log('✅ Widget content rendered safely');
-
-                  } catch (error) {
-                    console.error('❌ Safe render error:', error);
-                  }
-                };
-
-                setTimeout(safeRender, 50);
-              };
-
-              // Функция для очистки виджета
-              const cleanupWidget = (widget: any) => {
-                console.log('🔧 Widget unmounted:', widget);
-                try {
-                  const container = widget.contentRef || widget.container;
-                  if (container && document.body.contains(container)) {
-                    while (container.firstChild) {
-                      container.removeChild(container.firstChild);
-                    }
-                  }
-                } catch (error) {
-                  console.error('❌ Safe unmount error:', error);
-                }
-              };
 
               // Регистрируем тип виджета
               extension.registerWidgetType('bond-analyzer', {
@@ -114,11 +52,63 @@ export class RegistrationService {
                 handlers: {
                   mount: (widget: any) => {
                     console.log('Widget mounted:', widget);
-                    renderWidget(widget);
+                    const safeRender = () => {
+                      try {
+                        let container = widget.contentRef || widget.container;
+
+                        if (!container) {
+                          console.warn('❌ Container not found, retrying...');
+                          setTimeout(safeRender, 100);
+                          return;
+                        }
+
+                        if (!document.body.contains(container)) {
+                          console.warn('❌ Container not in DOM');
+                          return;
+                        }
+
+                        const newContent = document.createElement('div');
+                        newContent.style.cssText = `
+                      padding: 20px; 
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                      color: white; 
+                      border-radius: 8px; 
+                      height: 100%;
+                      box-sizing: border-box;
+                    `;
+                        newContent.innerHTML = `
+                      <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
+                      <p style="margin: 0 0 8px 0;">Анализ облигаций</p>
+                      <p style="margin: 0; font-size: 12px; opacity: 0.8;">Работает!</p>
+                    `;
+
+                        while (container.firstChild) {
+                          container.removeChild(container.firstChild);
+                        }
+
+                        container.appendChild(newContent);
+                        console.log('✅ Widget content rendered safely');
+
+                      } catch (error) {
+                        console.error('❌ Safe render error:', error);
+                      }
+                    };
+
+                    setTimeout(safeRender, 50);
                   },
                   unmount: (widget: any) => {
                     console.log('Widget unmounted:', widget);
-                    cleanupWidget(widget);
+                    console.log('🔧 Widget unmounted:', widget);
+                    try {
+                      const container = widget.contentRef || widget.container;
+                      if (container && document.body.contains(container)) {
+                        while (container.firstChild) {
+                          container.removeChild(container.firstChild);
+                        }
+                      }
+                    } catch (error) {
+                      console.error('❌ Safe unmount error:', error);
+                    }
                   },
                   tickerChange: (widget: any, oldTicker: string) => {
                     console.log('Ticker changed:', oldTicker, '->', widget.ticker);
@@ -131,6 +121,99 @@ export class RegistrationService {
                   }
                 }
               });
+              // extension.registerWidgetType('gamno-analyzer', {
+              //   layout: {
+              //     width: 400,
+              //     height: 300
+              //   },
+              //   settings: {
+              //     title: 'Анализ гамнагаций',
+              //     searchable: true,
+              //     symbolRequired: false,
+              //     noGroup: false,
+              //     fullscreenAllowed: true,
+              //     isSymbolResettingWithGroup: false,
+              //     useSymbolInTitle: false,
+              //     pinnable: true
+              //   },
+              //   menu: {
+              //     icon: 'chart',
+              //     label: 'Облигации EdickExt',
+              //     order: 1,
+              //     hint: 'Анализ гамнагаций'
+              //   },
+              //   handlers: {
+              //     mount: (widget: any) => {
+              //       console.log('Widget mounted:', widget);
+              //       const safeRender = () => {
+              //         try {
+              //           let container = widget.contentRef || widget.container;
+
+              //           if (!container) {
+              //             console.warn('❌ Container not found, retrying...');
+              //             setTimeout(safeRender, 100);
+              //             return;
+              //           }
+
+              //           if (!document.body.contains(container)) {
+              //             console.warn('❌ Container not in DOM');
+              //             return;
+              //           }
+
+              //           const newContent = document.createElement('div');
+              //           newContent.style.cssText = `
+              //         padding: 20px; 
+              //         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+              //         color: white; 
+              //         border-radius: 8px; 
+              //         height: 100%;
+              //         box-sizing: border-box;
+              //       `;
+              //           newContent.innerHTML = `
+              //         <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
+              //         <p style="margin: 0 0 8px 0;">Анализ гамна</p>
+              //         <p style="margin: 0; font-size: 12px; opacity: 0.8;">Работает!</p>
+              //       `;
+
+              //           while (container.firstChild) {
+              //             container.removeChild(container.firstChild);
+              //           }
+
+              //           container.appendChild(newContent);
+              //           console.log('✅ Widget content rendered safely');
+
+              //         } catch (error) {
+              //           console.error('❌ Safe render error:', error);
+              //         }
+              //       };
+
+              //       setTimeout(safeRender, 50);
+              //     },
+              //     unmount: (widget: any) => {
+              //       console.log('Widget unmounted:', widget);
+              //       console.log('🔧 Widget unmounted:', widget);
+              //       try {
+              //         const container = widget.contentRef || widget.container;
+              //         if (container && document.body.contains(container)) {
+              //           while (container.firstChild) {
+              //             container.removeChild(container.firstChild);
+              //           }
+              //         }
+              //       } catch (error) {
+              //         console.error('❌ Safe unmount error:', error);
+              //       }
+              //     },
+              //     tickerChange: (widget: any, oldTicker: string) => {
+              //       console.log('Ticker changed:', oldTicker, '->', widget.ticker);
+              //     },
+              //     groupChange: (widget: any, oldGroup: string) => {
+              //       console.log('Group changed:', oldGroup, '→', widget.group);
+              //     },
+              //     onCurrencyChange: (widget: any, oldCurrency: string) => {
+              //       console.log('Currency changed:', oldCurrency, '→', widget.currency);
+              //     }
+              //   }
+              // });
 
               console.log('✅ EdickExt: Successfully registered with new API');
               resolve({ success: true });
@@ -147,9 +230,9 @@ export class RegistrationService {
 
           } catch (error) {
             console.error('❌ Registration failed:', error);
-            resolve({ 
-              success: false, 
-              error: error instanceof Error ? error.message : 'Unknown error' 
+            resolve({
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error'
             });
           }
         });
@@ -163,13 +246,13 @@ export class RegistrationService {
 
       // ФИКС: правильная обработка типа
       const result = results[0].result as RegistrationResult;
-      
+
       logInfo('Auto-registration results:', result);
 
       if (result.success) {
         await showNotification(tab, 'EdickExt: Автоматически зарегистрирован! 🎉');
         logSuccess('Successfully registered for tab', tab.id);
-        
+
         // Проверим, зарегистрировались ли виджеты
         setTimeout(() => this.checkWidgetRegistration(tab), 1000);
       } else {
@@ -184,15 +267,15 @@ export class RegistrationService {
 
   private async checkWidgetRegistration(tab: TabInfo): Promise<void> {
     try {
-      const checkFunction = function(): string {
+      const checkFunction = function (): string {
         // Проверяем, появились ли наши виджеты в меню
         const widgets = document.querySelectorAll('[class*="widget"], [class*="Widget"]');
         console.log('Available widgets in DOM:', widgets.length);
-        
+
         // Ищем элементы, которые могут быть связаны с нашим виджетом
         const menuItems = document.querySelectorAll('[class*="menu"], [class*="Menu"]');
         console.log('Menu items:', menuItems.length);
-        
+
         return `Widgets: ${widgets.length}, Menu items: ${menuItems.length}`;
       };
 

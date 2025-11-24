@@ -11,26 +11,3 @@ export const TERMINAL_URL_PATTERNS = [
   'tinkoff.ru/invest/',
   /https:\/\/(www\.)?tinkoff\.ru\/invest\/[^\/]+\/terminal/
 ];
-
-export const DEFAULT_WIDGET_CONFIG = {
-  layout: {
-    width: 400,
-    height: 300
-  },
-  settings: {
-    title: 'Анализ облигаций',
-    searchable: true,
-    symbolRequired: false,
-    noGroup: false,
-    fullscreenAllowed: true,
-    isSymbolResettingWithGroup: false,
-    useSymbolInTitle: false,
-    pinnable: true
-  },
-  menu: {
-    icon: 'chart' as const,
-    label: 'Облигации EdickExt',
-    order: 1,
-    hint: 'Анализ облигаций'
-  }
-};

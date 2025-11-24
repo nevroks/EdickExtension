@@ -1,19 +1,16 @@
-import { TERMINAL_CHECK_DELAY } from "./extensionConsts";
+import { MAX_RETRY_ATTEMPTS, RETRY_INTERVAL, TERMINAL_CHECK_DELAY } from "./extensionConsts";
 import type { TabInfo, TerminalCheckResult } from "./extensionTypes";
 import { isTerminalUrl, logInfo, logError, logSuccess } from "./helpers";
-import { RegistrationService } from "./registration-manager";
+
 import { TabManager } from "./tab-manager";
 
 export class TerminalChecker {
     private tabManager: TabManager;
-    private registrationService: RegistrationService;
     // @ts-ignore
     private retryIntervals: Map<number, NodeJS.Timeout> = new Map();
 
-
     constructor(tabManager: TabManager) {
         this.tabManager = tabManager;
-        this.registrationService = new RegistrationService(tabManager);
     }
 
     async checkAllTerminalTabs(): Promise<void> {
@@ -30,108 +27,106 @@ export class TerminalChecker {
         }
     }
 
-    async checkTerminalAPI(tab: TabInfo): Promise<void> {
+    async checkTerminalAPI(tab: TabInfo): Promise<boolean> {
         try {
             if (this.tabManager.hasTab(tab.id!)) {
                 logSuccess('Already registered for tab', tab.id);
-                return;
+                return true; // Уже зарегистрированы - считаем что проверка прошла
             }
 
             logInfo('Checking terminal API for tab', tab.id);
 
-            // Функция для выполнения в контексте страницы - ОПРЕДЕЛЯЕМ ЕЁ ВНУТРИ МЕТОДА
-            const checkFunction = function (): TerminalCheckResult {
-                console.log('🔍 EdickExt: Auto-checking window.terminal in PAGE context...');
-
-                const terminal = (window as any).terminal;
-                if (terminal && typeof terminal.registerExtension === 'function') {
-                    console.log('✅ Terminal API available in auto-check!');
-                    return {
-                        found: true,
-                        terminal: '[Object]',
-                        keys: Object.keys(terminal),
-                        hasRegisterExtension: true
-                    };
-                } else {
-                    console.log('❌ No terminal API found in auto-check');
-                    return {
-                        found: false,
-                        reason: 'window.terminal is undefined or missing registerExtension'
-                    };
-                }
-            };
-
-            const results = await chrome.scripting.executeScript({
-                target: { tabId: tab.id! },
-                func: checkFunction,
-                world: 'MAIN'
-            });
-
-            const result = results[0].result as TerminalCheckResult;
+            const result = await this.executeTerminalCheck(tab.id!);
             console.log('Terminal check result:', result);
 
             if (result.found) {
                 logSuccess('Terminal API found for tab', tab.id);
-                await this.registrationService.registerExtension(tab);
+                return true;
             } else {
                 logError('Terminal API not found, retrying...');
-                // Раскомментируй когда будет готово
-                // this.retryTerminalCheck(tab);
+                return await this.retryTerminalCheck(tab);
             }
         } catch (error) {
             logError(`Check error for tab ${tab.id}:`, error);
+            return false;
         }
     }
 
-    // private async retryTerminalCheck(tab: TabInfo): Promise<void> {
-    //     if (this.tabManager.hasTab(tab.id!)) return;
+    private async executeTerminalCheck(tabId: number): Promise<TerminalCheckResult> {
+        const checkFunction = function (): TerminalCheckResult {
+            console.log('🔍 EdickExt: Auto-checking window.terminal in PAGE context...');
 
-    //     let attempts = 0;
+            const terminal = (window as any).terminal;
+            if (terminal && typeof terminal.registerExtension === 'function') {
+                console.log('✅ Terminal API available in auto-check!');
+                return {
+                    found: true,
+                    terminal: '[Object]',
+                    keys: Object.keys(terminal),
+                    hasRegisterExtension: true
+                };
+            } else {
+                console.log('❌ No terminal API found in auto-check');
+                return {
+                    found: false,
+                    reason: 'window.terminal is undefined or missing registerExtension'
+                };
+            }
+        };
 
-    //     const interval = setInterval(async () => {
-    //         if (this.tabManager.hasTab(tab.id!)) {
-    //             this.stopRetryForTab(tab.id!);
-    //             return;
-    //         }
+        const results = await chrome.scripting.executeScript({
+            target: { tabId },
+            func: checkFunction,
+            world: 'MAIN'
+        });
 
-    //         attempts++;
-    //         logInfo(`Attempt ${attempts}/${MAX_RETRY_ATTEMPTS} for tab ${tab.id}`);
+        return results[0].result as TerminalCheckResult;
+    }
 
-    //         try {
-    //             const checkFunction = function (): TerminalCheckResult {
-    //                 console.log('🔍 EdickExt: Checking window.terminal...');
-    //                 const terminal = (window as any).terminal;
-    //                 return {
-    //                     found: !!(terminal && typeof terminal.registerExtension === 'function'),
-    //                     reason: terminal ? 'API available' : 'No terminal object'
-    //                 };
-    //             };
+    private async retryTerminalCheck(tab: TabInfo): Promise<boolean> {
+        if (this.tabManager.hasTab(tab.id!)) return true;
 
-    //             const results = await chrome.scripting.executeScript({
-    //                 target: { tabId: tab.id! },
-    //                 func: checkFunction,
-    //                 world: 'MAIN'
-    //             });
+        let attempts = 0;
 
-    //             const result = results[0].result as TerminalCheckResult;
-    //             if (result.found) {
-    //                 this.stopRetryForTab(tab.id!);
-    //                 logSuccess(`Terminal API found on attempt ${attempts}`);
-    //                 await this.registrationService.registerExtension(tab);
-    //             } else if (attempts >= MAX_RETRY_ATTEMPTS) {
-    //                 this.stopRetryForTab(tab.id!);
-    //                 logError(`Terminal API not found after ${MAX_RETRY_ATTEMPTS} attempts`);
-    //             }
-    //         } catch (error) {
-    //             logError('Check attempt failed:', error);
-    //             if (attempts >= MAX_RETRY_ATTEMPTS) {
-    //                 this.stopRetryForTab(tab.id!);
-    //             }
-    //         }
-    //     }, RETRY_INTERVAL);
+        return new Promise((resolve) => {
+            const interval = setInterval(async () => {
+                if (this.tabManager.hasTab(tab.id!)) {
+                    clearInterval(interval);
+                    this.retryIntervals.delete(tab.id!);
+                    resolve(true);
+                    return;
+                }
 
-    //     this.retryIntervals.set(tab.id!, interval);
-    // }
+                attempts++;
+                logInfo(`Attempt ${attempts}/${MAX_RETRY_ATTEMPTS} for tab ${tab.id}`);
+
+                try {
+                    const result = await this.executeTerminalCheck(tab.id!);
+
+                    if (result.found) {
+                        clearInterval(interval);
+                        this.retryIntervals.delete(tab.id!);
+                        logSuccess(`Terminal API found on attempt ${attempts}`);
+                        resolve(true);
+                    } else if (attempts >= MAX_RETRY_ATTEMPTS) {
+                        clearInterval(interval);
+                        this.retryIntervals.delete(tab.id!);
+                        logError(`Terminal API not found after ${MAX_RETRY_ATTEMPTS} attempts`);
+                        resolve(false);
+                    }
+                } catch (error) {
+                    logError('Check attempt failed:', error);
+                    if (attempts >= MAX_RETRY_ATTEMPTS) {
+                        clearInterval(interval);
+                        this.retryIntervals.delete(tab.id!);
+                        resolve(false);
+                    }
+                }
+            }, RETRY_INTERVAL);
+
+            this.retryIntervals.set(tab.id!, interval);
+        });
+    }
 
     // Очистка всех интервалов при уничтожении
     cleanup(): void {
