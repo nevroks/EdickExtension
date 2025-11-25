@@ -1,3 +1,12 @@
+export interface WidgetsCheckResult {
+    available: boolean;
+    widgetsCount?: number;
+    widgetIds?: string[];
+    hasRenderWidget?: boolean;
+    hasGetWidgetComponent?: boolean;
+    reason?: string;
+}
+
 export interface TabInfo {
   id: number;
   url?: string;

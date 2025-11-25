@@ -24,7 +24,10 @@
         "https://*.tbank.ru/terminal/*"
       ],
       "js": [
-        "tinkoff-integration.js"
+        "react.production.min.js",
+        "react-dom.production.min.js",
+        "widgets.iife.js",
+        "content.js"
       ],
       "run_at": "document_start"
     }
@@ -34,5 +37,18 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "react.production.min.js",
+        "react-dom.production.min.js",
+        "widgets.iife.js"
+      ],
+      "matches": [
+        "https://*.tinkoff.ru/*",
+        "https://*.tbank.ru/*"
+      ]
+    }
+  ]
 }

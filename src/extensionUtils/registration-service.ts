@@ -1,3 +1,4 @@
+
 import type { TabInfo, RegistrationResult } from './extensionTypes.js';
 import { logInfo, showNotification, logSuccess, logError } from './helpers.js';
 import { TabManager } from './tab-manager.js';
@@ -31,7 +32,6 @@ export class RegistrationService {
       return false;
     }
   }
-
   private async executeRegistration(tabId: number): Promise<RegistrationResult> {
     const registerFunction = function (): Promise<RegistrationResult> {
       return new Promise((resolve) => {
@@ -44,8 +44,8 @@ export class RegistrationService {
           }).then((extension: any) => {
             console.log("Extension:", extension);
 
-            const renderWidget = (widget: any) => {
-              const safeRender = () => {
+            const renderReactWidget = async (widget: any, props: any) => {
+              const safeRender = async () => {
                 try {
                   let container = widget.contentRef || widget.container;
 
@@ -60,30 +60,49 @@ export class RegistrationService {
                     return;
                   }
 
-                  const newContent = document.createElement('div');
-                  newContent.style.cssText = `
-                                    padding: 20px; 
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                    color: white; 
-                                    border-radius: 8px; 
-                                    height: 100%;
-                                    box-sizing: border-box;
-                                `;
-                  newContent.innerHTML = `
-                                    <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
-                                    <p style="margin: 0 0 8px 0;">Анализ облигаций</p>
-                                    <p style="margin: 0; font-size: 12px; opacity: 0.8;">Работает!</p>
-                                `;
-
                   while (container.firstChild) {
                     container.removeChild(container.firstChild);
                   }
 
-                  container.appendChild(newContent);
-                  console.log('✅ Widget content rendered safely');
+                  const reactRoot = document.createElement('div');
+                  reactRoot.style.cssText = 'height: 100%; width: 100%;';
+                  container.appendChild(reactRoot);
+
+                  const { EdickExtWidgets } = window as any;
+
+                  // Используем универсальный рендерер
+                  EdickExtWidgets.renderWidget(
+                    props.widgetId,
+                    reactRoot,
+                    {
+                      ...props,
+                      onUpdate: (data: any) => {
+                        console.log('Widget update:', data);
+                      }
+                    }
+                  );
+                  // Используем универсальный рендерер из бандла
+
+                  console.log(`✅ Widget ${props.widgetId} rendered successfully`);
 
                 } catch (error) {
                   console.error('❌ Safe render error:', error);
+
+                  // Фолбэк на простой виджет если основной не загрузился
+                  try {
+                    const container = widget.contentRef || widget.container;
+                    if (container) {
+                      container.innerHTML = `
+                      <div style="padding: 20px; background: #ff6b6b; color: white; border-radius: 8px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                        <h3 style="margin: 0 0 12px 0;">💰 EdickExt</h3>
+                        <p style="margin: 0 0 8px 0;">Виджет временно недоступен</p>
+                        <p style="margin: 0; font-size: 12px; opacity: 0.8;">Ошибка загрузки</p>
+                      </div>
+                    `;
+                    }
+                  } catch (fallbackError) {
+                    console.error('❌ Fallback also failed:', fallbackError);
+                  }
                 }
               };
 
@@ -95,55 +114,80 @@ export class RegistrationService {
               try {
                 const container = widget.contentRef || widget.container;
                 if (container && document.body.contains(container)) {
+                  if ((window as any).ReactDOM) {
+                    (window as any).ReactDOM.unmountComponentAtNode(container);
+                  }
                   while (container.firstChild) {
                     container.removeChild(container.firstChild);
                   }
                 }
               } catch (error) {
-                console.error('❌ Safe unmount error:', error);
+                console.error('❌ Cleanup error:', error);
               }
             };
 
-            extension.registerWidgetType('bond-analyzer', {
-              layout: {
-                width: 400,
-                height: 300
-              },
-              settings: {
-                title: 'Анализ облигаций',
-                searchable: true,
-                symbolRequired: false,
-                noGroup: false,
-                fullscreenAllowed: true,
-                isSymbolResettingWithGroup: false,
-                useSymbolInTitle: false,
-                pinnable: true
-              },
-              menu: {
-                icon: 'chart',
-                label: 'Облигации EdickExt',
-                order: 1,
-                hint: 'Анализ облигаций'
-              },
-              handlers: {
-                mount: (widget: any) => {
-                  console.log('Widget mounted:', widget);
-                  renderWidget(widget);
-                },
-                unmount: (widget: any) => {
-                  console.log('Widget unmounted:', widget);
-                  cleanupWidget(widget);
-                },
-                tickerChange: (widget: any, oldTicker: string) => {
-                  console.log('Ticker changed:', oldTicker, '->', widget.ticker);
-                },
-                groupChange: (widget: any, oldGroup: string) => {
-                  console.log('Group changed:', oldGroup, '→', widget.group);
-                },
-                onCurrencyChange: (widget: any, oldCurrency: string) => {
-                  console.log('Currency changed:', oldCurrency, '→', widget.currency);
+            const widgetConfigs = [
+              {
+                id: 'bond-analyzer',
+                config: {
+                  layout: { width: 400, height: 300 },
+                  settings: {
+                    title: 'Анализ облигаций',
+                    searchable: true,
+                    symbolRequired: false,
+                    noGroup: false,
+                    fullscreenAllowed: true,
+                    isSymbolResettingWithGroup: false,
+                    useSymbolInTitle: false,
+                    pinnable: true
+                  },
+                  menu: {
+                    icon: 'chart',
+                    label: 'Облигации EdickExt',
+                    order: 1,
+                    hint: 'Анализ облигаций'
+                  }
                 }
               }
+            ];
+
+            const updateWidget = (widget: any) => {
+              renderReactWidget(widget, {
+                ticker: widget.ticker,
+                group: widget.group,
+                currency: widget.currency,
+                widgetId: widget.widgetType?.id || 'bond-analyzer'
+              });
+            };
+
+            widgetConfigs.forEach(({ id, config }) => {
+              extension.registerWidgetType(id, {
+                ...config,
+                handlers: {
+                  mount: (widget: any) => {
+                    console.log(`Widget ${id} mounted:`, widget);
+                    renderReactWidget(widget, {
+                      ticker: widget.ticker,
+                      group: widget.group,
+                      currency: widget.currency,
+                      widgetId: id
+                    });
+                  },
+                  unmount: cleanupWidget,
+                  tickerChange: (widget: any, oldTicker: string) => {
+                    console.log(`Ticker changed in ${id}:`, oldTicker, '->', widget.ticker);
+                    updateWidget(widget);
+                  },
+                  groupChange: (widget: any, oldGroup: string) => {
+                    console.log(`Group changed in ${id}:`, oldGroup, '→', widget.group);
+                    updateWidget(widget);
+                  },
+                  onCurrencyChange: (widget: any, oldCurrency: string) => {
+                    console.log(`Currency changed in ${id}:`, oldCurrency, '→', widget.currency);
+                    updateWidget(widget);
+                  }
+                }
+              });
             });
 
             console.log('✅ EdickExt: Successfully registered with new API');
@@ -179,4 +223,7 @@ export class RegistrationService {
     const resultPromise = results[0].result as Promise<RegistrationResult>;
     return await resultPromise;
   }
+
 }
+
+
