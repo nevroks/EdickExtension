@@ -9,13 +9,17 @@
   "permissions": [
     "scripting",
     "storage",
-    "activeTab"
+    "activeTab",
+    "notifications",
+    "alarms",
+    "background"
   ],
   "host_permissions": [
     "https://invest-public-api.tinkoff.ru/*",
     "https://api-invest.tinkoff.ru/*",
     "https://*.tinkoff.ru/*",
-    "https://*.tbank.ru/*"
+    "https://*.tbank.ru/*",
+    "wss://extension.api.askerovgroup.ru/*"
   ],
   "content_scripts": [
     {

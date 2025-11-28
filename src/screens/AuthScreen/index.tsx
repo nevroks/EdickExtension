@@ -6,6 +6,9 @@ import LoginForm from "./ScreenComponents/LoginForm";
 import RegisterForm from "./ScreenComponents/RegisterForm";
 import type { LoginDto, RegisterDto } from "@/utils/api/authApi/AuthApi";
 import useAuthApi from "@/utils/hooks/useAuthApi";
+import { useChromeStorage } from "@/utils/hooks/useChromeStorage";
+import { useNavigation } from "@/utils/contexts/NavigationContext";
+import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 
 
 const formVariants: Variants = {
@@ -24,6 +27,13 @@ const AuthScreen = () => {
 
     const [formMode, setFormMode] = useState<'login' | 'register'>('login')
 
+    const { navigateTo } = useNavigation()
+
+    const [jwtTokens, setJwtTokens] = useChromeStorage(CHROME_STORAGE_KEYS["jwt-tokens"], {
+        accessToken: "",
+        refreshToken: ""
+    })
+    const [isAuth, setIsAuth] = useChromeStorage(CHROME_STORAGE_KEYS['isAuth'], false)
 
     const { mutations: {
         register: { mutateAsync: registerFunc },
@@ -32,15 +42,19 @@ const AuthScreen = () => {
 
     const handleRegister = (dto: RegisterDto) => {
         registerFunc(dto).then(data => {
-            console.log(data);
-
+            setJwtTokens({
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+            }).then(() => setIsAuth(true)).then(() => navigateTo('main'));
         })
     }
 
     const handleLogin = (dto: LoginDto) => {
         loginFunc(dto).then(data => {
-            console.log(data);
-
+            setJwtTokens({
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+            }).then(() => setIsAuth(true)).then(() => navigateTo('main'));  
         })
     }
 

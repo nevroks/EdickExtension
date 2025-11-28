@@ -1,4 +1,5 @@
 import { Button, TextInput } from "@/ui";
+import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 import { useChromeStorage } from "@/utils/hooks/useChromeStorage";
 import useTInstrumentsApi from "@/utils/hooks/useTInstrumentsApi";
 
@@ -8,7 +9,7 @@ const MainScreen = () => {
 
 
     const { queries: { getBonds } } = useTInstrumentsApi()
-    const [tinkoffToken, setTinkoffToken] = useChromeStorage('T-key', "")
+    const [tinkoffToken, setTinkoffToken] = useChromeStorage(CHROME_STORAGE_KEYS["T-key"], "")
 
     const { data, error, refetch } = getBonds('INSTRUMENT_STATUS_UNSPECIFIED', 'INSTRUMENT_EXCHANGE_UNSPECIFIED')
 

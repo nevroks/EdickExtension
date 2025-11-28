@@ -31,7 +31,11 @@ export default defineConfig({
           return 'assets/[name]-[hash].js'
         },
         assetFileNames: 'assets/[name]-[hash][extname]'
-      }
+      },
+      external: ['chrome']
     },
   },
+  optimizeDeps: {
+    include: ['socket.io-client']
+  }
 });
