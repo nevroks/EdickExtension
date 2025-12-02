@@ -1,6 +1,4 @@
-// React нужен для классического JSX transform (jsxRuntime: 'classic')
-// @ts-ignore - React используется неявно через JSX
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface BondAnalyzerWidgetProps {
   ticker?: string;

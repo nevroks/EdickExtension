@@ -1,6 +1,5 @@
 // Главный файл бандла виджетов
-import { BondAnalyzerWidget } from "./BondAnalyzerWidget/BondAnalyzerWidget";
-
+import { BondAnalyzerWidget } from './BondAnalyzerWidget/BondAnalyzerWidget';
 
 // Импорты остальных виджетов...
 
@@ -38,26 +37,17 @@ if (typeof window !== 'undefined') {
         throw new Error('React not available');
       }
       
-      // Проверяем версию React
-      const reactVersion = React.version;
-      console.log('Using React version:', reactVersion);
-      
       try {
-        // Используем createRoot для React 18+ вместо устаревшего render
         if (typeof ReactDOM.createRoot === 'function') {
           const root = ReactDOM.createRoot(container);
           root.render(React.createElement(WidgetComponent, props));
-          // Сохраняем root для возможности unmount в будущем
           (container as any).__edickExtRoot = root;
         } else {
-          // Fallback для старых версий React
           console.warn('ReactDOM.createRoot not available, using legacy render');
           ReactDOM.render(React.createElement(WidgetComponent, props), container);
         }
       } catch (error) {
         console.error('Error rendering widget:', error);
-        console.error('WidgetComponent type:', typeof WidgetComponent);
-        console.error('WidgetComponent:', WidgetComponent);
         throw error;
       }
     },
@@ -75,6 +65,4 @@ if (typeof window !== 'undefined') {
       console.log('Available widgets:', Object.keys((window as any).EdickExtWidgets.components));
     }
   };
-  
-  console.log('✅ EdickExt Widgets Bundle loaded');
 }
