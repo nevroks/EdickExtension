@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import type { CHROME_STORAGE_KEYS } from '../consts/appConsts';
 
-export function useChromeStorage<T>(key: string, initialValue: T) {
+export function useChromeStorage<T>(key: keyof typeof CHROME_STORAGE_KEYS, initialValue: T) {
   const [value, setValue] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,12 +20,26 @@ export function useChromeStorage<T>(key: string, initialValue: T) {
     };
 
     loadValue();
+
+    // слушаем изменения из других компонентов
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, namespace: string) => {
+      if (namespace === 'local' && changes[key]) {
+        console.log(`Storage changed for key ${key}:`, changes[key].newValue);
+        setValue(changes[key].newValue);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
   }, [key]);
 
   const setStoredValue = async (newValue: T) => {
     try {
-      setValue(newValue);
-      await chrome.storage.local.set({ [key]: newValue });
+      setValue(newValue); // Сначала обновляем локальное состояние
+      await chrome.storage.local.set({ [key]: newValue }); // Потом сохраняем
     } catch (error) {
       console.error('Error saving to storage:', error);
     }

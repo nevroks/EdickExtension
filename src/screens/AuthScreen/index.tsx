@@ -29,11 +29,11 @@ const AuthScreen = () => {
 
     const { navigateTo } = useNavigation()
 
-    const [jwtTokens, setJwtTokens] = useChromeStorage(CHROME_STORAGE_KEYS["jwt-tokens"], {
+    const [jwtTokens, setJwtTokens] = useChromeStorage('jwt-tokens', {
         accessToken: "",
         refreshToken: ""
     })
-    const [isAuth, setIsAuth] = useChromeStorage(CHROME_STORAGE_KEYS['isAuth'], false)
+    const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
 
     const { mutations: {
         register: { mutateAsync: registerFunc },
@@ -50,11 +50,20 @@ const AuthScreen = () => {
     }
 
     const handleLogin = (dto: LoginDto) => {
+        console.log(dto);
+
+
+
+
         loginFunc(dto).then(data => {
             setJwtTokens({
                 accessToken: data.accessToken,
                 refreshToken: data.refreshToken
-            }).then(() => setIsAuth(true)).then(() => navigateTo('main'));  
+            }).then(() => setIsAuth(true).then(() => {
+                console.log("in navigator", isAuth);
+
+                navigateTo('main')
+            }))
         })
     }
 

@@ -8,6 +8,7 @@ export class WebSocketManager {
     private isConnected: boolean = false;
     private reconnectAttempts: number = 0;
     private maxReconnectAttempts: number = 5;
+    private reconnectTimeout: NodeJS.Timeout | null = null;
 
     constructor(jwtManager: JwtManager) {
         this.jwtManager = jwtManager;
@@ -34,12 +35,18 @@ export class WebSocketManager {
             this.socket.disconnect();
         }
 
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
+
         try {
-            this.socket = io('wss://extension.api.askerovgroup.ru/news', {
-                transports: ['websocket'],
+            this.socket = io('https://extension.api.askerovgroup.ru', {
+                transports: ['websocket', 'polling'],
                 auth: {
                     token: this.jwtManager.getTokens()!.accessToken
-                }
+                },
+                // timeout: 5000
             });
 
             this.setupEventHandlers();
@@ -50,30 +57,48 @@ export class WebSocketManager {
     }
 
     private setupEventHandlers() {
-        this.socket!.on('connect', () => {
+        // заглушка для ts
+        if (!this.socket) return;
+
+        this.socket.on('connect', () => {
             this.isConnected = true;
             this.reconnectAttempts = 0;
             logSuccess('WebSocket connected');
         });
 
-        this.socket!.on('disconnect', (reason: string) => {
+        this.socket.on('disconnect', (reason: string) => {
             this.isConnected = false;
             logError('WebSocket disconnected:', reason);
-            this.handleReconnect();
+
+            // ✅ РАЗЛИЧАЕМ ПРИЧИНЫ ОТКЛЮЧЕНИЯ
+            if (reason === 'io server disconnect') {
+                // Сервер явно отключил нас - вероятно проблемы с аутентификацией
+                logError('Server disconnected us - likely authentication issue');
+                this.handleAuthError();
+            } else {
+                // Другие причины (network issues etc)
+                this.handleReconnect();
+            }
         });
 
-        this.socket!.on('connect_error', (error: Error) => {
+        this.socket.on('connect_error', (error: Error) => {
             logError('WebSocket connection error:', error);
-            this.handleReconnect();
+
+            // ✅ ПРОВЕРЯЕМ ТИП ОШИБКИ
+            if (error.message.includes('auth') || error.message.includes('401')) {
+                this.handleAuthError();
+            } else {
+                this.handleReconnect();
+            }
         });
 
-        this.socket!.on('auth_error', () => {
+        this.socket.on('auth_error', () => {
             logError('JWT authentication failed');
             this.handleAuthError();
         });
 
         // Обработка бизнес-событий
-        this.socket!.on('new_news', (data: any) => {
+        this.socket.on('new_news', (data: any) => {
             this.handleNewsUpdate(data);
         });
     }
@@ -81,20 +106,32 @@ export class WebSocketManager {
         logInfo('Received news update:', data);
         chrome.notifications.create({
             type: 'basic',
-            iconUrl: 'icon-48.png',
+            iconUrl: '/notification-icon.png',
             title: data.source,
-            message: data.text
+            message: data.text,
+            contextMessage: 'EdickExt', // источник внизу уведомления
+            priority: 2 // нормальный приоритет
         });
     }
 
     private async handleAuthError() {
-        // Запрашиваем новый JWT токен
+        logInfo('Handling authentication error...');
+
+        // ✅ ПРЕКРАЩАЕМ ПЕРЕПОДКЛЮЧЕНИЯ ПРИ ОШИБКАХ АУТЕНТИФИКАЦИИ
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
+
         const success = await this.jwtManager.refreshTokens();
         if (success) {
-            this.reconnect(); // переподключаемся с новыми токенами
+            logInfo('Tokens refreshed, reconnecting...');
+            this.reconnect();
         } else {
-            console.error('WebSocketManager: Token refresh failed, disconnecting...');
+            logError('Token refresh failed, stopping reconnection attempts');
             this.disconnect();
+            // Можно также очистить токены
+            this.jwtManager.resetTokens();
         }
     }
 
@@ -115,14 +152,25 @@ export class WebSocketManager {
 
     reconnect() {
         this.reconnectAttempts = 0;
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+        }
         this.connect();
     }
 
     disconnect() {
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
+
         if (this.socket) {
             this.socket.disconnect();
+            this.socket = null;
             this.isConnected = false;
         }
+
+        this.reconnectAttempts = 0;
     }
 
     getConnectionStatus(): boolean {

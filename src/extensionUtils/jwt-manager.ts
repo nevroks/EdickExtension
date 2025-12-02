@@ -64,6 +64,11 @@ export class JwtManager {
 
     }
 
+    resetTokens() {
+        this.tokens = null;
+        chrome.storage.local.remove(CHROME_STORAGE_KEYS["jwt-tokens"]);
+    }
+    
     getTokens(): { accessToken: string; refreshToken: string } | null {
         return this.tokens;
     }

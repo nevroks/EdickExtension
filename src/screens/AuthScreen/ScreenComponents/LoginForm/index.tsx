@@ -16,8 +16,8 @@ type LoginFormProps = {
 const LoginForm = ({ onSuccessSubmit, setFormMode }: LoginFormProps) => {
     const [loginDto, setLoginDto] = useState(
         {
-            email: '',
-            password: ''
+            email: 'nitubro1617@gmail.com',
+            password: '123456'
         }
     )
 
