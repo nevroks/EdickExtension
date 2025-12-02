@@ -8,7 +8,7 @@ export interface ReactCheckResult {
     reactVersion?: string;
     reactDOMVersion?: string;
     hasCreateElement?: boolean;
-    hasRender?: boolean;
+    hasCreateRoot?: boolean;
     reason?: string;
 }
 
@@ -100,7 +100,7 @@ export class ReactChecker {
                     reactVersion: React.version,
                     reactDOMVersion: ReactDOM.version,
                     hasCreateElement: typeof React.createElement === 'function',
-                    hasRender: typeof ReactDOM.render === 'function'
+                    hasCreateRoot: typeof ReactDOM.createRoot === 'function'
                 };
             } else {
                 console.log('❌ React not found in MAIN world');
