@@ -23,8 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+build
 build/
-
+build/*
+.build/*
+./build
 
 
 package-lock.json
