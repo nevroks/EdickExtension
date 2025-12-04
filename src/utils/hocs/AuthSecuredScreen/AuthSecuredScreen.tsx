@@ -3,7 +3,6 @@
 import { useChromeStorage } from "./../../hooks/useChromeStorage";
 import { useNavigation } from "./../../contexts/NavigationContext";
 import { useEffect, type ReactNode } from "react";
-import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 
 
 
@@ -15,6 +14,7 @@ const AuthSecuredScreen = ({ screen }: AuthSecuredScreenProps) => {
 
     const [isAuth, _setIsAuth, isLoading] = useChromeStorage('isAuth', false)
     const { navigateTo } = useNavigation()
+
 
     console.log("In secured:", isAuth);
 

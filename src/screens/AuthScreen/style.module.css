@@ -1,9 +1,25 @@
 .AuthScreen {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+.AuthScreen-logo {
+  position: absolute;
+  
+}
+.AuthScreen-title {
+    position: absolute;
+}
+
+.AuthScreen-title-register {
+    top: 75px;
+}
+
+.AuthScreen-title-login {
+    top: 115px;
 }
 
 .AuthScreen-form {
@@ -19,6 +35,6 @@
 
     /* Градиентный бордер через border-image */
     border: 3px solid rgb(166, 6, 229);
-    
+
     overflow: hidden;
 }

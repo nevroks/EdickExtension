@@ -1,19 +1,22 @@
 import { Button, FormField } from "@/ui";
 import { motion } from "motion/react";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { contentVariants } from "../..";
+
 import styles from "./style.module.css"
 import classNames from "classnames";
 import { emailRegex } from "../RegisterForm";
 import type { LoginDto } from "@/utils/api/authApi/AuthApi";
+import type { AnimationSteps } from "../..";
+
 
 
 type LoginFormProps = {
     onSuccessSubmit: (dto: LoginDto) => void
-    setFormMode: Dispatch<SetStateAction<'login' | 'register'>>
+    logoAnimationTriggerFn: (mode: "login" | "register") => void
+    animationStep: AnimationSteps
 }
 
-const LoginForm = ({ onSuccessSubmit, setFormMode }: LoginFormProps) => {
+const LoginForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: LoginFormProps) => {
     const [loginDto, setLoginDto] = useState(
         {
             email: 'nitubro1617@gmail.com',
@@ -34,7 +37,7 @@ const LoginForm = ({ onSuccessSubmit, setFormMode }: LoginFormProps) => {
             return;
         }
         if (!emailRegex.test(loginDto.email)) {
-            setLoginErrors({  password: '', email: 'Please enter a valid email address' });
+            setLoginErrors({ password: '', email: 'Please enter a valid email address' });
             return;
         }
         if (loginDto.password.length === 0) {
@@ -56,13 +59,7 @@ const LoginForm = ({ onSuccessSubmit, setFormMode }: LoginFormProps) => {
     }
 
     return (
-        <motion.div
-            key="login-form"
-            variants={contentVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.3 }}
+        <div
             className={styles["LoginForm-container"]}
         >
             <FormField className={styles["LoginForm-field-login"]} error={loginErrors.email}>
@@ -90,12 +87,16 @@ const LoginForm = ({ onSuccessSubmit, setFormMode }: LoginFormProps) => {
                 <div className={styles["LoginForm-footer-register"]}>
                     <p className={classNames("text-8px", "text-400")}>Нет аккаунта?</p>
                     <p className={classNames("text-8px", "text-400", styles['LoginForm-linklike-text'])}
-                        onClick={() => setFormMode("register")}
+                        onClick={() => {
+                            if (animationStep === "0") {
+                                logoAnimationTriggerFn("register")
+                            }
+                        }}
                     >
                         Зарегистрироваться</p>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 }
 

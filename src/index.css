@@ -147,15 +147,61 @@ legend {
   font-size: 8px;
 }
 
+.text-53px {
+  font-size: 53px;
+}
+
 .text-400 {
   font-weight: 400;
 }
 
+.text-800 {
+  font-weight: 800;
+}
+
 .App {
+  overflow: hidden;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   width: 600px;
   height: 500px;
-  background: -webkit-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
+  background-color: black;
+  /* background: -webkit-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
   background: -moz-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
-  background: linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
+  background: linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144)); */
+}
+
+.App-light1 {
+  position: absolute;
+  top: -479px;
+  left: calc(100% / 2 - 498px / 2);
+  width: 498px;
+  height: 514px;
+  background: rgba(255, 255, 255, 1);
+  filter: blur(280px);
+  opacity: 0.4;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.App-light2 {
+  position: absolute;
+  top: -560px;
+  left: calc((901px - 100%) / 2 * -1);
+  width: 901px;
+  height: 748px;
+  background: #A915FF;
+  opacity: 0.4;
+  border-radius: 50%;
+  filter: blur(300px);
+  z-index: 1;
+}
+
+.App-content {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  z-index: 3;
 }
