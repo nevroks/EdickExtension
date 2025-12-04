@@ -1,20 +1,23 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { contentVariants } from "../..";
+
 import { motion } from "motion/react";
 import { Button, FormField } from "@/ui";
 import styles from "./style.module.css"
 import classNames from "classnames";
 import type { RegisterDto } from "@/utils/api/authApi/AuthApi";
+import type { AnimationSteps } from "../..";
+
 
 
 type RegisterFormProps = {
     onSuccessSubmit: (dto: RegisterDto) => void
-    setFormMode: Dispatch<SetStateAction<'login' | 'register'>>
+    logoAnimationTriggerFn: (mode: "login" | "register") => void
+    animationStep: AnimationSteps
 }
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const RegisterForm = ({ onSuccessSubmit, setFormMode }: RegisterFormProps) => {
+const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: RegisterFormProps) => {
 
 
     const [registerDto, setRegisterDto] = useState(
@@ -76,13 +79,7 @@ const RegisterForm = ({ onSuccessSubmit, setFormMode }: RegisterFormProps) => {
     }
 
     return (
-        <motion.div
-            key="register-form"
-            variants={contentVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.3 }}
+        <div
             className={styles['RegisterForm-container']}
         >
             <FormField className={styles["RegisterForm-field"]} error={registerErrors.login}>
@@ -123,13 +120,17 @@ const RegisterForm = ({ onSuccessSubmit, setFormMode }: RegisterFormProps) => {
             <div className={styles["RegisterForm-footer"]}>
                 <p className={classNames("text-8px", "text-400")}>Есть аккаунт?</p>
                 <p
-                    onClick={() => setFormMode("login")}
+                    onClick={() => {
+                        if (animationStep === "0") {
+                            logoAnimationTriggerFn("login")
+                        }
+                    }}
                     className={classNames("text-8px", "text-400", styles['RegisterForm-linklike-text'])}
                 >
                     Войти
                 </p>
             </div>
-        </motion.div>
+        </div>
     );
 }
 
