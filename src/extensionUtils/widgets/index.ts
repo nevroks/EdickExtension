@@ -1,12 +1,13 @@
-
-
 import type { WidgetConfig } from '../extensionTypes';
 import { BondAnalyzerWidget } from './BondAnalyzerWidget/BondAnalyzerWidget';
+import { NewsWidget } from './NewsWidget/NewsWidget';
 
 // Реестр всех доступных виджетов
 export const WIDGET_REGISTRY: Record<string, WidgetConfig> = {
-    // @ts-ignore
+    // @ts-expect-error - WidgetConfig type may not match component type
     'bond-analyzer': BondAnalyzerWidget,
+    // @ts-expect-error - WidgetConfig type may not match component type
+    'news': NewsWidget,
     // 'portfolio-viewer': portfolioViewerWidget,
     // 'market-scanner': marketScannerWidget,
 };
@@ -21,6 +22,6 @@ export const getAllWidgetConfigs = (): WidgetConfig[] => {
 };
 
 export const getWidgetComponent = (widgetId: string) => {
-    // @ts-ignore
+    // @ts-expect-error - component property may not exist on WidgetConfig
     return WIDGET_REGISTRY[widgetId]?.component;
 };

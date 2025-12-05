@@ -28,8 +28,6 @@
         "https://*.tbank.ru/terminal/*"
       ],
       "js": [
-        "react.production.min.js",
-        "react-dom.production.min.js",
         "widgets.iife.js",
         "content.js"
       ],
@@ -46,9 +44,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "react.production.min.js",
-        "react-dom.production.min.js",
-        "widgets.iife.js"
+        "widgets.iife.js",
+        "widgets.css"
       ],
       "matches": [
         "https://*.tinkoff.ru/*",

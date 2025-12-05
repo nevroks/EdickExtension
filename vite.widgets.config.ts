@@ -1,17 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
     react({
-      // Используем классический JSX transform для совместимости с external React
-      jsxRuntime: 'classic'
+      // Используем автоматический JSX transform, так как React теперь в бандле
+      jsxRuntime: 'automatic'
     })
   ],
   define: {
     'process.env.NODE_ENV': JSON.stringify('production')
   },
   resolve: {
+    alias: {
+      '@/utils': path.resolve(__dirname, './src/utils'),
+      '@/components': path.resolve(__dirname, './src/components/index.ts'),
+      '@/ui': path.resolve(__dirname, './src/components/ui/index.ts'),
+    },
   },
   build: {
     outDir: 'build',
@@ -23,14 +29,21 @@ export default defineConfig({
       fileName: 'widgets'
     },
     rollupOptions: {
-      // Указываем что React берем из глобальной области
-      external: ['react', 'react-dom'],
+      // НЕ делаем React external - включаем его в бандл
+      // Это позволит react-query работать корректно
+      external: [],
       output: {
-        globals: {
-          'react': 'React',
-          'react-dom': 'ReactDOM'
+        // Извлекаем CSS в отдельный файл
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.endsWith('.css')) {
+            return 'widgets.css';
+          }
+          return 'assets/[name]-[hash][extname]';
         }
       }
-    }
+    },
+    // Включаем извлечение CSS
+    cssCodeSplit: false,
+    cssMinify: true
   },
 })
