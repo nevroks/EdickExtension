@@ -190,10 +190,10 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                     setSuccessFormAnimationStep("3");
                     setTimeout(() => {
                         resolve();
-                    }, 400)
-                }, 800);
+                    }, 600)
+                }, 1000);
 
-            }, 800);
+            }, 1000);
         });
     };
 
@@ -261,7 +261,8 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                         className={styles["AuthScreen-form-screen"]}
                         exit={{
                             opacity: 0,
-                            transition: { duration: 0.8 }
+                            scale: 0.7,
+                            transition: { duration: 1 }
                         }}
                     >
                         <motion.img
@@ -309,14 +310,16 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                     <motion.div
                         key="success-screen"
                         className={styles["AuthScreen-success-screen"]}
-                        initial={{ opacity: 0 }}
+                        initial={{ opacity: 0, scale: 0.7 }}
                         animate={{
                             opacity: 1,
-                            transition: { duration: 0.8 }
+                            scale: 1,
+                            transition: { duration: 1 }
                         }}
                         exit={{
                             opacity: 0,
-                            transition: { duration: 0.4 }
+                            y: 300,
+                            transition: { duration: 0.6 }
                         }}
                     >
                         <div className={styles["AuthScreen-success-screen-content"]}>
