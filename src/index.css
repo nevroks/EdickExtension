@@ -167,13 +167,50 @@ legend {
   position: relative;
   width: 600px;
   height: 500px;
+
   background-color: black;
-  /* background: -webkit-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
-  background: -moz-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
-  background: linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144)); */
 }
 
+.App::before {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: 0px;
+
+  width: 600px;
+  height: 500px;
+  
+  opacity: 0.4;
+  z-index: 1;
+
+  background-image:
+    radial-gradient(ellipse 150% 500px at 50% 0px,
+      rgba(169, 21, 255, 1) 0%,
+      rgba(169, 21, 255, 0.8) 20%,
+      rgba(169, 21, 255, 0.5) 40%,
+      rgba(169, 21, 255, 0.3) 60%,
+      rgba(169, 21, 255, 0.2) 80%,
+      transparent 100%);
+
+}
+
+
+
 .App-light1 {
+  position: absolute;
+  top: -54px;
+  left: calc(100% / 2 - 108px / 2);
+  width: 108px;
+  height: 1px;
+  border-radius: 50%;
+  z-index: 2;
+  opacity: 0.4;
+  -webkit-box-shadow: 0px 0px 240px 100px rgba(255, 255, 255, 1);
+  -moz-box-shadow: 0px 0px 240px 100px rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 240px 100px rgba(255, 255, 255, 1);
+}
+
+/* .App-light1 {
   position: absolute;
   top: -479px;
   left: calc(100% / 2 - 498px / 2);
@@ -184,9 +221,27 @@ legend {
   opacity: 0.4;
   border-radius: 50%;
   z-index: 2;
-}
+} */
 
-.App-light2 {
+/* .App-light2 {
+  position: absolute;
+  top: -200px;
+   left: calc((300px - 100%) / 2 * -1);
+  width: 600px;
+  height: 300px;
+
+  background: #A915FF;
+  border-radius: 50%;
+  opacity: 0.4;
+  z-index: 1;
+  -webkit-box-shadow: 0px 0px 0px 350px rgba(169, 21, 255, 0.4);
+  -moz-box-shadow: 0px 0px 0px 350px rgba(169, 21, 255, 0.4);
+  filter: drop-shadow(0 0 200px rgb(169, 21, 255));
+  box-shadow: none;
+  
+} */
+
+/* .App-light2 {
   position: absolute;
   top: -560px;
   left: calc((901px - 100%) / 2 * -1);
@@ -197,11 +252,11 @@ legend {
   border-radius: 50%;
   filter: blur(300px);
   z-index: 1;
-}
+} */
 
 .App-content {
   display: flex;
   flex: 1;
   height: 100%;
-  z-index: 3;
+  z-index: 4;
 }
