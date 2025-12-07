@@ -147,12 +147,20 @@ legend {
   font-size: 8px;
 }
 
+.text-33px {
+  font-size: 33px;
+}
+
 .text-53px {
   font-size: 53px;
 }
 
 .text-400 {
   font-weight: 400;
+}
+
+.text-600 {
+  font-weight: 600;
 }
 
 .text-800 {
@@ -179,7 +187,7 @@ legend {
 
   width: 600px;
   height: 500px;
-  
+
   opacity: 0.4;
   z-index: 1;
 
