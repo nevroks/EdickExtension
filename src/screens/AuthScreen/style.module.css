@@ -1,15 +1,21 @@
 .AuthScreen {
-    position: relative;
     display: flex;
     flex: 1;
+}
+
+.AuthScreen-form-screen {
+    position: relative;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex: 1;
 }
+
 .AuthScreen-logo {
-  position: absolute;
-  
+    position: absolute;
 }
+
 .AuthScreen-title {
     position: absolute;
 }
@@ -37,4 +43,22 @@
     border: 3px solid rgb(166, 6, 229);
 
     overflow: hidden;
+}
+
+.AuthScreen-success-screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.AuthScreen-success-screen-content {
+    position: relative;
+    top: -20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 21px
 }
