@@ -10,13 +10,12 @@ import { useChromeStorage } from "@/utils/hooks/useChromeStorage";
 import { useNavigation } from "@/utils/contexts/NavigationContext";
 import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 import classNames from "classnames";
-
-import logo from './../../assets/logo.svg';
 import logoSecondStyle from './../../assets/logoSecondStyle.svg';
 
 
 type AuthScreenProps = {
-
+    animationStep: AnimationSteps
+    setAnimationStep: (steps: AnimationSteps) => void
 }
 
 const animationStepsDuration = {
@@ -24,44 +23,9 @@ const animationStepsDuration = {
     2: 0.3,
     3: 0.4
 }
-const firstSuccessAnimationVariants = {
-    initial: { opacity: 0 },
-    animate: {
-        opacity: 1,
-        transition: {
-            duration: 0.3,
-            ease: "easeIn"
-        }
-    },
-    exit: {
-        opacity: 0,
-        transition: {
-            duration: 0.8, // уходит за 0.8 секунд
-            ease: "easeOut"
-        }
-    }
-};
-
-const secondSuccessAnimationVariants = {
-    initial: { opacity: 0 },
-    animate: {
-        opacity: 1,
-        transition: {
-            duration: 0.6, // появляется за 0.6 секунд
-            ease: "easeIn"
-        }
-    },
-    exit: {
-        opacity: 0,
-        transition: {
-            duration: 0.3, // исчезает за 0.3 секунды
-            ease: "easeOut"
-        }
-    }
-};
-const LogoVariants: Variants = {
+export const LogoVariants: Variants = {
     0: {
-        opacity: 0.4,
+        opacity: 0.5,
         y: 0,
         transition: {
             duration: animationStepsDuration["1"],
@@ -82,7 +46,7 @@ const LogoVariants: Variants = {
         }
     },
     3: {
-        opacity: 0.4,
+        opacity: 0.5,
         y: 0,
         transition: {
             duration: animationStepsDuration["3"],
@@ -177,7 +141,8 @@ export type AnimationSteps = "0" | "1" | "2" | "3"
 // 2 шаг анимации успеха это контент добро пожаловать и логотип появляется
 // 3 шаг анимации успеха это контент добро пожаловать и логотип исчезает
 
-const AuthScreen = ({ }: AuthScreenProps) => {
+
+const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
 
     const [successFormAnimationStep, setSuccessFormAnimationStep] = useState<"0" | "1" | "2" | "3">("0");
 
@@ -190,16 +155,16 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                     setSuccessFormAnimationStep("3");
                     setTimeout(() => {
                         resolve();
-                    }, 600)
-                }, 1000);
+                    }, 800)
+                }, 1200);
 
-            }, 1000);
+            }, 1200);
         });
     };
 
 
 
-    const [animationStep, setAnimationStep] = useState<AnimationSteps>("0");
+   
     const [formMode, setFormMode] = useState<'login' | 'register'>('login')
 
     const LogoAnimationTriggerFn = (changeModeTo: "login" | "register") => {
@@ -262,17 +227,9 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                         exit={{
                             opacity: 0,
                             scale: 0.7,
-                            transition: { duration: 1 }
+                            transition: { duration: 1.2 }
                         }}
                     >
-                        <motion.img
-                            className={styles["AuthScreen-logo"]}
-                            src={logo}
-                            alt="Logo-Img"
-                            initial={false}
-                            variants={LogoVariants}
-                            animate={animationStep}
-                        />
                         <motion.p
                             initial={false}
                             variants={TextVariants}
@@ -314,12 +271,12 @@ const AuthScreen = ({ }: AuthScreenProps) => {
                         animate={{
                             opacity: 1,
                             scale: 1,
-                            transition: { duration: 1 }
+                            transition: { duration: 1.2 }
                         }}
                         exit={{
                             opacity: 0,
-                            y: 300,
-                            transition: { duration: 0.6 }
+                            y: 400,
+                            transition: { duration: 0.8 }
                         }}
                     >
                         <div className={styles["AuthScreen-success-screen-content"]}>
