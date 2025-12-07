@@ -158,7 +158,7 @@ const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
                     }, 800)
                 }, 1200);
 
-            }, 1200);
+            }, 1000);
         });
     };
 
@@ -227,7 +227,7 @@ const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
                         exit={{
                             opacity: 0,
                             scale: 0.7,
-                            transition: { duration: 1.2 }
+                            transition: { duration: 1 }
                         }}
                     >
                         <motion.p
