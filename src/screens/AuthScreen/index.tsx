@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import styles from "./style.module.css";
 
 import { AnimatePresence, motion, type Variants } from "motion/react";
@@ -16,6 +16,8 @@ import logoSecondStyle from './../../assets/logoSecondStyle.svg';
 type AuthScreenProps = {
     animationStep: AnimationSteps
     setAnimationStep: (steps: AnimationSteps) => void
+    successFormAnimationStep: "0" | "1" | "2" | "3"
+    setSuccessFormAnimationStep: Dispatch<SetStateAction<"0" | "1" | "2" | "3">>
 }
 
 const animationStepsDuration = {
@@ -142,9 +144,9 @@ export type AnimationSteps = "0" | "1" | "2" | "3"
 // 3 шаг анимации успеха это контент добро пожаловать и логотип исчезает
 
 
-const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
+const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep, setSuccessFormAnimationStep }: AuthScreenProps) => {
 
-    const [successFormAnimationStep, setSuccessFormAnimationStep] = useState<"0" | "1" | "2" | "3">("0");
+
 
     const showSuccessAnimation = (): Promise<void> => {
         return new Promise((resolve) => {
@@ -155,6 +157,9 @@ const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
                     setSuccessFormAnimationStep("3");
                     setTimeout(() => {
                         resolve();
+                        setTimeout(() => {
+                            setSuccessFormAnimationStep("0");
+                        }, 1)
                     }, 800)
                 }, 1200);
 
@@ -164,7 +169,7 @@ const AuthScreen = ({ setAnimationStep, animationStep }: AuthScreenProps) => {
 
 
 
-   
+
     const [formMode, setFormMode] = useState<'login' | 'register'>('login')
 
     const LogoAnimationTriggerFn = (changeModeTo: "login" | "register") => {

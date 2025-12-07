@@ -204,11 +204,16 @@ legend {
   filter: blur(180px);
   z-index: 1;
 }
-
-.AuthScreen-logo {
+.App-logo-container{
+  mix-blend-mode: soft-light;
   position: absolute;
   z-index: 3;
-  mix-blend-mode: soft-light;
+  display: flex;
+  flex: 1;
+}
+.AuthScreen-logo {
+  
+  
 }
 
 .App-content {
