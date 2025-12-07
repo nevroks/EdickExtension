@@ -25,6 +25,13 @@ const animationStepsDuration = {
 }
 
 const LogoVariants: Variants = {
+    0: {
+        opacity: 0.4,
+        y: 0,
+        transition: {
+            duration: animationStepsDuration["1"],
+        }
+    },
     1: {
         opacity: 0,
         y: 200,
@@ -40,8 +47,8 @@ const LogoVariants: Variants = {
         }
     },
     3: {
-        opacity: 0,
-        y: 200,
+        opacity: 0.4,
+        y: 0,
         transition: {
             duration: animationStepsDuration["3"],
         }
