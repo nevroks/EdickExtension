@@ -39,17 +39,10 @@ export class RegistrationService {
     }
   }
   private async executeRegistration(tabId: number): Promise<RegistrationResult> {
-    const tokens = await new Promise<{ accessToken?: string; refreshToken?: string } | null>((resolve) => {
-      chrome.storage.local.get(['jwt-tokens'], (result: any) => {
-        resolve(result['jwt-tokens'] || null);
-      });
-    });
-
-    const accessToken = tokens?.accessToken || null;
-
     const widgetsCssUrl = chrome.runtime.getURL('widgets.css');
+    const extensionId = chrome.runtime.id;
 
-    const registerFunction = function (accessToken: string | null, cssUrl: string): Promise<RegistrationResult> {
+    const registerFunction = function (cssUrl: string, extensionId: string): Promise<RegistrationResult> {
       return new Promise((resolve) => {
         try {
           const injectWidgetsCSS = () => {
@@ -71,6 +64,11 @@ export class RegistrationService {
           };
 
           injectWidgetsCSS();
+
+          // Сохраняем Extension ID в глобальной переменной для использования в виджетах
+          if (!(window as any).__EDICK_EXTENSION_ID__) {
+            (window as any).__EDICK_EXTENSION_ID__ = extensionId;
+          }
 
           console.log('🎯 EdickExt: Registering with NEW API...');
 
@@ -112,7 +110,6 @@ export class RegistrationService {
                     reactRoot,
                     {
                       ...props,
-                      accessToken: accessToken, // Передаем токен в props
                       onUpdate: (data: any) => {
                         console.log('Widget update:', data);
                       }
@@ -216,7 +213,6 @@ export class RegistrationService {
                 group: widget.group,
                 currency: widget.currency,
                 widgetId: widget.widgetType?.id || 'bond-analyzer',
-                accessToken: accessToken
               });
             };
 
@@ -231,7 +227,6 @@ export class RegistrationService {
                       group: widget.group,
                       currency: widget.currency,
                       widgetId: id,
-                      accessToken: accessToken
                     });
                   },
                   unmount: cleanupWidget,
@@ -277,7 +272,7 @@ export class RegistrationService {
     const results = await chrome.scripting.executeScript({
       target: { tabId },
       func: registerFunction,
-      args: [accessToken, widgetsCssUrl], // Передаем токен и URL CSS как аргументы
+      args: [widgetsCssUrl, extensionId], // Передаем URL CSS и Extension ID
       world: 'MAIN'
     });
 

@@ -1,6 +1,31 @@
 // Content script для инициализации виджетов
 console.log('🧩 EdickExt Content Script started');
 
+const MESSAGE_SOURCE = 'EDICK_EXT_JWT_PROVIDER';
+const MESSAGE_TARGET = 'EDICK_EXT_CONTENT_SCRIPT';
+
+window.addEventListener('message', (event) => {
+  if (event.data?.source !== MESSAGE_SOURCE) {
+    return;
+  }
+
+  if (event.data.type === 'GET_ACCESS_TOKEN') {
+    chrome.runtime.sendMessage(
+      { type: 'GET_ACCESS_TOKEN' },
+      (response) => {
+        window.postMessage(
+          {
+            source: MESSAGE_TARGET,
+            requestId: event.data.requestId,
+            accessToken: response?.accessToken || null,
+          },
+          '*'
+        );
+      }
+    );
+  }
+});
+
 // Функция для проверки загрузки виджетов
 const checkWidgetsLoaded = () => {
   if ((window as any).EdickExtWidgets) {
@@ -24,7 +49,7 @@ const waitForWidgets = () => {
     console.log(`🏁 Widgets check finished after ${checkCount} attempts`);
     return;
   }
-  
+
   checkCount++;
   setTimeout(waitForWidgets, 100);
 };
@@ -36,7 +61,7 @@ setTimeout(waitForWidgets, 100);
 setTimeout(() => {
   console.log('🔍 Debug - Available globals:', {
     React: !!(window as any).React,
-    ReactDOM: !!(window as any).ReactDOM, 
+    ReactDOM: !!(window as any).ReactDOM,
     EdickExtWidgets: !!(window as any).EdickExtWidgets,
     terminal: !!(window as any).terminal
   });

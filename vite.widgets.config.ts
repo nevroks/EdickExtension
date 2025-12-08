@@ -17,6 +17,7 @@ export default defineConfig({
       '@/utils': path.resolve(__dirname, './src/utils'),
       '@/components': path.resolve(__dirname, './src/components/index.ts'),
       '@/ui': path.resolve(__dirname, './src/components/ui/index.ts'),
+      '@/extensionUtils': path.resolve(__dirname, './src/extensionUtils'),
     },
   },
   build: {

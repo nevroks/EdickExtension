@@ -55,13 +55,22 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.
   }
 });
 
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   switch (request.type) {
-//     case 'WS_RECONNECT':
-//       websocketManager.reconnect();
-//       break;
-//   }
-// });
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  switch (request.type) {
+    case 'GET_ACCESS_TOKEN': {
+      // Возвращаем accessToken из JwtManager
+      const tokens = jwtManager.getTokens();
+      sendResponse({ accessToken: tokens?.accessToken || null });
+      return true; // Указываем, что ответ будет асинхронным
+    }
+
+    // case 'WS_RECONNECT': {
+    //   websocketManager.reconnect();
+    //   sendResponse({ success: true });
+    //   return true;
+    // }
+  }
+});
 
 chrome.runtime.onSuspend.addListener(() => {
   terminalChecker.cleanup();

@@ -1,10 +1,18 @@
-import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useRef, useState, useEffect } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   NewsApi,
   type NewsItem,
 } from '@/utils/api/newsApi/NewsApi';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
 
 import styles from './NewsWidget.module.css';
 
@@ -18,18 +26,12 @@ const queryClient = new QueryClient({
   },
 });
 
-interface NewsWidgetProps {
-  accessToken?: string;
-}
-
-const NewsWidgetContent = ({ accessToken }: NewsWidgetProps) => {
+const NewsWidgetContent = () => {
   const newsApiRef = useRef<NewsApi | null>(null);
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
 
   if (!newsApiRef.current) {
-    newsApiRef.current = new NewsApi(accessToken);
-  } else if (accessToken) {
-    newsApiRef.current.setAccessToken(accessToken);
+    newsApiRef.current = new NewsApi();
   }
 
   const { data, isLoading, error, isRefetching } = useQuery({
@@ -134,10 +136,10 @@ const NewsWidgetContent = ({ accessToken }: NewsWidgetProps) => {
   );
 };
 
-export const NewsWidget = ({ accessToken }: NewsWidgetProps = {}) => {
+export const NewsWidget = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <NewsWidgetContent accessToken={accessToken} />
+      <NewsWidgetContent />
     </QueryClientProvider>
   );
 };

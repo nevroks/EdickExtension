@@ -1,6 +1,7 @@
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 
+import { JwtTokenProvider } from '@/extensionUtils/jwt-token-provider';
 import { APP_BACKEND_URL } from '@/utils/consts/appConsts';
 
 export type NewsItem = {
@@ -20,31 +21,28 @@ type NewsResponse = {
 
 export class NewsApi {
     private api: AxiosInstance
-    private accessToken: string | null = null;
 
-    constructor(accessToken?: string) {
+    constructor() {
         this.api = axios.create({
             baseURL: APP_BACKEND_URL
         })
 
-        if (accessToken) {
-            this.accessToken = accessToken;
-        }
-
         this.setupAuthInterceptor();
-    }
-
-    setAccessToken(accessToken: string) {
-        this.accessToken = accessToken;
     }
 
     private setupAuthInterceptor() {
         this.api.interceptors.request.use(
-            (config) => {
-                if (this.accessToken) {
-                    config.headers.Authorization = `Bearer ${this.accessToken}`;
-                } else {
-                    console.warn('📡 NewsApi: JWT token not available');
+            async (config) => {
+                try {
+                    const accessToken = await JwtTokenProvider.getAccessToken();
+
+                    if (accessToken) {
+                        config.headers.Authorization = `Bearer ${accessToken}`;
+                    } else {
+                        console.warn('NewsApi: JWT token not available');
+                    }
+                } catch (error) {
+                    console.error('NewsApi: Error getting token:', error);
                 }
 
                 return config;
