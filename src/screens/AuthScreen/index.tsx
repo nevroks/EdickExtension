@@ -198,8 +198,8 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
     const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
 
     const { mutations: {
-        register: { mutateAsync: registerFunc },
-        login: { mutateAsync: loginFunc }
+        register: { mutateAsync: registerFunc, error: registerError, isPending: isRegisterPending },
+        login: { mutateAsync: loginFunc, error: loginError, isPending: isLoginPending }
     } } = useAuthApi()
 
 
@@ -228,7 +228,7 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                 {successFormAnimationStep === "0" &&
                     <motion.div
                         key="form-screen"
-                        className={styles["AuthScreen-form-screen"]}
+                        className={classNames(styles["AuthScreen-form-screen"])}
                         exit={{
                             opacity: 0,
                             scale: 0.7,
@@ -248,17 +248,21 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                         <motion.div
                             variants={formMode === 'login' ? LoginFormVariants : RegisterFormVariants}
                             animate={animationStep}
-                            className={styles["AuthScreen-form"]}
+                            className={classNames(styles["AuthScreen-form"], {
+                                [styles['pending']]: isLoginPending || isRegisterPending
+                            })}
                         >
                             <AnimatePresence mode="wait">
                                 {formMode === 'login' ? (
                                     <LoginForm
+                                        loginServerError={loginError ? loginError.response.data?.message : null}
                                         animationStep={animationStep}
                                         logoAnimationTriggerFn={LogoAnimationTriggerFn}
                                         onSuccessSubmit={handleLogin}
                                     />
                                 ) : (
                                     <RegisterForm
+                                        registerServerError={registerError ? registerError.response.data?.message : null}
                                         animationStep={animationStep}
                                         logoAnimationTriggerFn={LogoAnimationTriggerFn}
                                         onSuccessSubmit={handleRegister}
