@@ -189,7 +189,7 @@ export class RegistrationService {
                   layout: { width: 400, height: 500 },
                   settings: {
                     title: 'Новости',
-                    searchable: false,
+                    searchable: true,
                     symbolRequired: false,
                     noGroup: false,
                     fullscreenAllowed: true,

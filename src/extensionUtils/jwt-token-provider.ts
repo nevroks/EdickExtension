@@ -32,7 +32,7 @@ export class JwtTokenProvider {
   static async getAccessToken(): Promise<string | null> {
     try {
       if (typeof window === 'undefined') {
-        console.warn('📡 JwtTokenProvider: window not available');
+        console.warn('JwtTokenProvider: window not available');
         return null;
       }
 
@@ -60,13 +60,13 @@ export class JwtTokenProvider {
         setTimeout(() => {
           if (this.pendingRequests.has(requestId)) {
             this.pendingRequests.delete(requestId);
-            console.warn('📡 JwtTokenProvider: Request timeout');
+            console.warn('JwtTokenProvider: Request timeout');
             resolve(null);
           }
         }, 5000);
       });
     } catch (error) {
-      console.error('📡 JwtTokenProvider: Error:', error);
+      console.error('JwtTokenProvider: Error:', error);
       return null;
     }
   }
@@ -74,7 +74,7 @@ export class JwtTokenProvider {
   static async refreshTokens(): Promise<{ accessToken: string; refreshToken: string } | null> {
     try {
       if (typeof window === 'undefined') {
-        console.warn('📡 JwtTokenProvider: window not available');
+        console.warn('JwtTokenProvider: window not available');
         return null;
       }
 
@@ -101,13 +101,13 @@ export class JwtTokenProvider {
         setTimeout(() => {
           if (this.pendingRequests.has(requestId)) {
             this.pendingRequests.delete(requestId);
-            console.warn('📡 JwtTokenProvider: Refresh tokens request timeout');
+            console.warn('JwtTokenProvider: Refresh tokens request timeout');
             resolve(null);
           }
         }, 10000);
       });
     } catch (error) {
-      console.error('📡 JwtTokenProvider: Error refreshing tokens:', error);
+      console.error('JwtTokenProvider: Error refreshing tokens:', error);
       return null;
     }
   }
