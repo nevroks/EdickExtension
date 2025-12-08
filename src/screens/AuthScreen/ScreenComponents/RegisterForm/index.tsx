@@ -13,11 +13,12 @@ type RegisterFormProps = {
     onSuccessSubmit: (dto: RegisterDto) => void
     logoAnimationTriggerFn: (mode: "login" | "register") => void
     animationStep: AnimationSteps
+    registerServerError: string | null
 }
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: RegisterFormProps) => {
+const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep, registerServerError }: RegisterFormProps) => {
 
 
     const [registerDto, setRegisterDto] = useState(
@@ -71,6 +72,7 @@ const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }
             return;
         }
 
+        setRegisterErrors({ login: '', password: '', confirmPassword: '', email: '' })
         onSuccessSubmit({
             email: registerDto.email,
             password: registerDto.password,
@@ -82,7 +84,7 @@ const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }
         <div
             className={styles['RegisterForm-container']}
         >
-            <FormField className={styles["RegisterForm-field"]} error={registerErrors.login}>
+            <FormField className={styles["RegisterForm-field"]} error={registerServerError ? registerServerError : registerErrors.login}>
                 <FormField.TextInput
                     onChange={(e) => setRegisterDto(prev => ({ ...prev, login: e.target.value }))}
                     placeholder="Логин"
@@ -106,7 +108,7 @@ const RegisterForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }
                 />
                 <FormField.Error />
             </FormField>
-            <FormField className={styles["RegisterForm-field-email"]} error={registerErrors.email}>
+            <FormField className={styles["RegisterForm-field-email"]} error={registerServerError && registerServerError === "User with this email already exists" ? registerServerError : registerErrors.email}>
                 <FormField.TextInput
                     onChange={(e) => setRegisterDto(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Email"

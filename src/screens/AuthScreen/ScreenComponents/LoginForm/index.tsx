@@ -13,10 +13,11 @@ import type { AnimationSteps } from "../..";
 type LoginFormProps = {
     onSuccessSubmit: (dto: LoginDto) => void
     logoAnimationTriggerFn: (mode: "login" | "register") => void
-    animationStep: AnimationSteps
+    animationStep: AnimationSteps,
+    loginServerError: string | null
 }
 
-const LoginForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: LoginFormProps) => {
+const LoginForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep, loginServerError }: LoginFormProps) => {
     const [loginDto, setLoginDto] = useState(
         {
             email: 'nitubro1617@gmail.com',
@@ -53,6 +54,7 @@ const LoginForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: L
             return;
         }
 
+        setLoginErrors({ password: '', email: '' })
         onSuccessSubmit(loginDto)
 
 
@@ -62,7 +64,7 @@ const LoginForm = ({ onSuccessSubmit, logoAnimationTriggerFn, animationStep }: L
         <div
             className={styles["LoginForm-container"]}
         >
-            <FormField className={styles["LoginForm-field-login"]} error={loginErrors.email}>
+            <FormField className={styles["LoginForm-field-login"]} error={loginServerError ? loginServerError : loginErrors.email}>
                 <FormField.TextInput
                     onChange={(e) => setLoginDto(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="e-mail"
