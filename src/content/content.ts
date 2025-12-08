@@ -24,6 +24,22 @@ window.addEventListener('message', (event) => {
       }
     );
   }
+
+  if (event.data.type === 'REFRESH_TOKENS') {
+    chrome.runtime.sendMessage(
+      { type: 'REFRESH_TOKENS' },
+      (response) => {
+        window.postMessage(
+          {
+            source: MESSAGE_TARGET,
+            requestId: event.data.requestId,
+            tokens: response?.tokens || null,
+          },
+          '*'
+        );
+      }
+    );
+  }
 });
 
 // Функция для проверки загрузки виджетов

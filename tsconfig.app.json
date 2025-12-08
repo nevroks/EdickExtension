@@ -25,6 +25,9 @@
       "@/utils/*": [
         "./src/utils/*"
       ],
+      "@/extensionUtils/*": [
+        "./src/extensionUtils/*"
+      ],
       "@/components": [
         "./src/components/index.ts"
       ],

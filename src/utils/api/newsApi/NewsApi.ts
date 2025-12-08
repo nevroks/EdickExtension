@@ -1,8 +1,16 @@
-import type { AxiosInstance } from 'axios';
+import type {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import axios from 'axios';
 
 import { JwtTokenProvider } from '@/extensionUtils/jwt-token-provider';
 import { APP_BACKEND_URL } from '@/utils/consts/appConsts';
+
+// Расширяем тип конфигурации для добавления флага _retry
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
 
 export type NewsItem = {
     id: number;
@@ -48,6 +56,38 @@ export class NewsApi {
                 return config;
             },
             error => Promise.reject(error)
+        );
+
+        this.api.interceptors.response.use(
+            response => response,
+            async error => {
+                const originalRequest = error.config as ExtendedAxiosRequestConfig | undefined;
+
+                if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+                    originalRequest._retry = true;
+
+                    try {
+                        const tokens = await JwtTokenProvider.refreshTokens();
+
+                        if (tokens && tokens.accessToken) {
+                            originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+
+                            return this.api(originalRequest);
+                        } else {
+                            console.error('NewsApi: Token refresh failed');
+                            if (typeof window !== 'undefined') {
+                                // Можно добавить что-то
+                            }
+                            return Promise.reject(error);
+                        }
+                    } catch (refreshError) {
+                        console.error('NewsApi: Error during token refresh:', refreshError);
+                        return Promise.reject(refreshError);
+                    }
+                }
+
+                return Promise.reject(error);
+            }
         );
     }
 

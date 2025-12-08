@@ -20,11 +20,11 @@ export class JwtTokenProvider {
         return;
       }
 
-      const { requestId, accessToken } = event.data;
+      const { requestId, accessToken, tokens } = event.data;
       if (requestId !== undefined && this.pendingRequests.has(requestId)) {
         const resolve = this.pendingRequests.get(requestId)!;
         this.pendingRequests.delete(requestId);
-        resolve(accessToken || null);
+        resolve(tokens || accessToken || null);
       }
     });
   }
@@ -67,6 +67,47 @@ export class JwtTokenProvider {
       });
     } catch (error) {
       console.error('📡 JwtTokenProvider: Error:', error);
+      return null;
+    }
+  }
+
+  static async refreshTokens(): Promise<{ accessToken: string; refreshToken: string } | null> {
+    try {
+      if (typeof window === 'undefined') {
+        console.warn('📡 JwtTokenProvider: window not available');
+        return null;
+      }
+
+      if (this.pendingRequests.size === 0) {
+        this.initializeListener();
+      }
+
+      const requestId = ++this.requestIdCounter;
+
+      return new Promise((resolve) => {
+        this.pendingRequests.set(requestId, (value) => {
+          resolve(value as { accessToken: string; refreshToken: string } | null);
+        });
+
+        window.postMessage(
+          {
+            source: MESSAGE_SOURCE,
+            type: 'REFRESH_TOKENS',
+            requestId,
+          },
+          '*'
+        );
+
+        setTimeout(() => {
+          if (this.pendingRequests.has(requestId)) {
+            this.pendingRequests.delete(requestId);
+            console.warn('📡 JwtTokenProvider: Refresh tokens request timeout');
+            resolve(null);
+          }
+        }, 10000);
+      });
+    } catch (error) {
+      console.error('📡 JwtTokenProvider: Error refreshing tokens:', error);
       return null;
     }
   }

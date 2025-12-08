@@ -8,8 +8,6 @@ import { TerminalChecker } from "../extensionUtils/terminal-checker";
 import { WebSocketManager } from "../extensionUtils/websocket-manager";
 import { WidgetsChecker } from "../extensionUtils/widgets-checker";
 
-
-
 console.log('EdickExt: Background script loaded');
 
 
@@ -62,6 +60,21 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       const tokens = jwtManager.getTokens();
       sendResponse({ accessToken: tokens?.accessToken || null });
       return true; // Указываем, что ответ будет асинхронным
+    }
+
+    case 'REFRESH_TOKENS': {
+      jwtManager.refreshTokens().then((success) => {
+        if (success) {
+          const tokens = jwtManager.getTokens();
+          sendResponse({ tokens: tokens || null });
+        } else {
+          sendResponse({ tokens: null });
+        }
+      }).catch((error) => {
+        console.error('Background: Error refreshing tokens:', error);
+        sendResponse({ tokens: null });
+      });
+      return true;
     }
 
     // case 'WS_RECONNECT': {
