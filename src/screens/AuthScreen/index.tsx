@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import styles from "./style.module.css";
 
 import { AnimatePresence, motion, type Variants } from "motion/react";
@@ -10,12 +10,14 @@ import { useChromeStorage } from "@/utils/hooks/useChromeStorage";
 import { useNavigation } from "@/utils/contexts/NavigationContext";
 import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 import classNames from "classnames";
-
-import logo from './../../assets/logo.svg'
+import logoSecondStyle from './../../assets/logoSecondStyle.svg';
 
 
 type AuthScreenProps = {
-
+    animationStep: AnimationSteps
+    setAnimationStep: (steps: AnimationSteps) => void
+    successFormAnimationStep: "0" | "1" | "2" | "3"
+    setSuccessFormAnimationStep: Dispatch<SetStateAction<"0" | "1" | "2" | "3">>
 }
 
 const animationStepsDuration = {
@@ -23,8 +25,14 @@ const animationStepsDuration = {
     2: 0.3,
     3: 0.4
 }
-
-const LogoVariants: Variants = {
+export const LogoVariants: Variants = {
+    0: {
+        opacity: 0.5,
+        y: 0,
+        transition: {
+            duration: animationStepsDuration["1"],
+        }
+    },
     1: {
         opacity: 0,
         y: 200,
@@ -40,8 +48,8 @@ const LogoVariants: Variants = {
         }
     },
     3: {
-        opacity: 0,
-        y: 200,
+        opacity: 0.5,
+        y: 0,
         transition: {
             duration: animationStepsDuration["3"],
         }
@@ -131,10 +139,34 @@ export type AnimationSteps = "0" | "1" | "2" | "3"
 // 3 шаг, Надпись появляется, логотип поднимается
 
 
-const AuthScreen = ({ }: AuthScreenProps) => {
+// 1 шаг анимации успеха это форма и её фон пропадает 
+// 2 шаг анимации успеха это контент добро пожаловать и логотип появляется
+// 3 шаг анимации успеха это контент добро пожаловать и логотип исчезает
 
 
-    const [animationStep, setAnimationStep] = useState<AnimationSteps>("0");
+const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep, setSuccessFormAnimationStep }: AuthScreenProps) => {
+
+
+
+    const showSuccessAnimation = (): Promise<void> => {
+        return new Promise((resolve) => {
+            setSuccessFormAnimationStep("1");
+            setTimeout(() => {
+                setSuccessFormAnimationStep("2");
+                setTimeout(() => {
+                    setSuccessFormAnimationStep("3");
+                    setTimeout(() => {
+                        resolve();
+                        setTimeout(() => {
+                            setSuccessFormAnimationStep("0");
+                        }, 1)
+                    }, 800)
+                }, 1200);
+
+            }, 1000);
+        });
+    };
+
 
 
 
@@ -176,7 +208,7 @@ const AuthScreen = ({ }: AuthScreenProps) => {
             setJwtTokens({
                 accessToken: data.accessToken,
                 refreshToken: data.refreshToken
-            }).then(() => setIsAuth(true)).then(() => navigateTo('main'));
+            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
@@ -185,83 +217,83 @@ const AuthScreen = ({ }: AuthScreenProps) => {
             setJwtTokens({
                 accessToken: data.accessToken,
                 refreshToken: data.refreshToken
-            }).then(() => setIsAuth(true).then(() => {
-                navigateTo('main')
-            }))
+            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
 
-
     return (
         <div className={styles["AuthScreen"]}>
-            <motion.img
-                className={styles["AuthScreen-logo"]}
-                src={logo}
-                alt="Logo-Img"
-                initial={false}
-                variants={LogoVariants}
-                animate={animationStep}
-            />
-            <motion.p
-                initial={false}
-                variants={TextVariants}
-                animate={animationStep}
-                className={classNames('text-53px', 'text-800', styles["AuthScreen-title"], {
-                    [styles["AuthScreen-title-register"]]: formMode === 'register',
-                    [styles["AuthScreen-title-login"]]: formMode === 'login'
-                })}>
-                {formMode === 'register' ? 'Регистрация' : 'Вход'}
-            </motion.p>
-            <motion.div
-                variants={formMode === 'login' ? LoginFormVariants : RegisterFormVariants}
-                animate={animationStep}
-                className={styles["AuthScreen-form"]}
-            >
+            <AnimatePresence mode="wait">
+                {successFormAnimationStep === "0" &&
+                    <motion.div
+                        key="form-screen"
+                        className={styles["AuthScreen-form-screen"]}
+                        exit={{
+                            opacity: 0,
+                            scale: 0.7,
+                            transition: { duration: 1 }
+                        }}
+                    >
+                        <motion.p
+                            initial={false}
+                            variants={TextVariants}
+                            animate={animationStep}
+                            className={classNames('text-53px', 'text-800', styles["AuthScreen-title"], {
+                                [styles["AuthScreen-title-register"]]: formMode === 'register',
+                                [styles["AuthScreen-title-login"]]: formMode === 'login'
+                            })}>
+                            {formMode === 'register' ? 'Регистрация' : 'Вход'}
+                        </motion.p>
+                        <motion.div
+                            variants={formMode === 'login' ? LoginFormVariants : RegisterFormVariants}
+                            animate={animationStep}
+                            className={styles["AuthScreen-form"]}
+                        >
+                            <AnimatePresence mode="wait">
+                                {formMode === 'login' ? (
+                                    <LoginForm
+                                        animationStep={animationStep}
+                                        logoAnimationTriggerFn={LogoAnimationTriggerFn}
+                                        onSuccessSubmit={handleLogin}
+                                    />
+                                ) : (
+                                    <RegisterForm
+                                        animationStep={animationStep}
+                                        logoAnimationTriggerFn={LogoAnimationTriggerFn}
+                                        onSuccessSubmit={handleRegister}
+                                    />
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    </motion.div>
+                }
+                {successFormAnimationStep === "2" &&
+                    <motion.div
+                        key="success-screen"
+                        className={styles["AuthScreen-success-screen"]}
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{
+                            opacity: 1,
+                            scale: 1,
+                            transition: { duration: 1.2 }
+                        }}
+                        exit={{
+                            opacity: 0,
+                            y: 400,
+                            transition: { duration: 0.8 }
+                        }}
+                    >
+                        <div className={styles["AuthScreen-success-screen-content"]}>
+                            <p className="text-33px text-600">Добро пожаловать!</p>
+                            <img src={logoSecondStyle} alt="Logo" />
+                        </div>
+                    </motion.div>
+                }
+            </AnimatePresence>
 
-                <AnimatePresence mode="wait">
-                    {formMode === 'login' ? (
-                        <LoginForm animationStep={animationStep} logoAnimationTriggerFn={LogoAnimationTriggerFn} onSuccessSubmit={
-
-                            handleLogin
-                        } />
-                    ) : (
-                        <RegisterForm animationStep={animationStep} logoAnimationTriggerFn={LogoAnimationTriggerFn} onSuccessSubmit={
-
-                            handleRegister
-                        } />
-                    )}
-                </AnimatePresence>
-            </motion.div>
         </div>
     );
 
 }
 export default AuthScreen;
-
-
-
-
-
-
-
-// <FormField className={styles["AuthScreen-form-field-login"]} error={errors.login}>
-//     <FormField.TextInput onChange={(e) => setLoginDto(prev => ({ ...prev, login: e.target.value }))} placeholder="Логин" />
-//     <FormField.Error />
-// </FormField>
-// <FormField className={styles["AuthScreen-form-field-password"]} error={errors.password}>
-//     <FormField.TextInput onChange={(e) => setLoginDto(prev => ({ ...prev, password: e.target.value }))} placeholder="Пароль" />
-//     <FormField.Error />
-// </FormField>
-// <Button className={styles["AuthScreen-form-button"]} onClick={handleFormSubmit}>
-//     <Button.Text text="Вход" />
-// </Button>
-// <div className={styles["AuthScreen-form-footer"]}>
-//     <div>
-//         <p>Забыл пароль</p>
-//     </div>
-//     <div>
-//         <p>Нет аккаунта?</p>
-//         <p onClick={() => setFormMode("register")}>Зарегистрироваться</p>
-//     </div>
-// </div>

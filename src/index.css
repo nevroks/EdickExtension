@@ -147,12 +147,20 @@ legend {
   font-size: 8px;
 }
 
+.text-33px {
+  font-size: 33px;
+}
+
 .text-53px {
   font-size: 53px;
 }
 
 .text-400 {
   font-weight: 400;
+}
+
+.text-600 {
+  font-weight: 600;
 }
 
 .text-800 {
@@ -167,20 +175,18 @@ legend {
   position: relative;
   width: 600px;
   height: 500px;
+
   background-color: black;
-  /* background: -webkit-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
-  background: -moz-linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144));
-  background: linear-gradient(45deg, rgb(0, 0, 0) 58%, rgb(129, 0, 144)); */
 }
 
 .App-light1 {
   position: absolute;
-  top: -479px;
-  left: calc(100% / 2 - 498px / 2);
-  width: 498px;
-  height: 514px;
+  top: -470px;
+  left: calc(100% / 2 - 500px / 2);
+  width: 500px;
+  height: 500px;
   background: rgba(255, 255, 255, 1);
-  filter: blur(280px);
+  filter: blur(130px);
   opacity: 0.4;
   border-radius: 50%;
   z-index: 2;
@@ -195,13 +201,24 @@ legend {
   background: #A915FF;
   opacity: 0.4;
   border-radius: 50%;
-  filter: blur(300px);
+  filter: blur(180px);
   z-index: 1;
+}
+.App-logo-container{
+  mix-blend-mode: soft-light;
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex: 1;
+}
+.AuthScreen-logo {
+  
+  
 }
 
 .App-content {
   display: flex;
   flex: 1;
   height: 100%;
-  z-index: 3;
+  z-index: 4;
 }
