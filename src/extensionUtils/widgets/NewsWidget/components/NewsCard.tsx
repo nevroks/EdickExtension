@@ -28,7 +28,7 @@ export const NewsCard = ({ item, onTickerClick }: NewsCardProps) => {
               onClick={() => onTickerClick?.(ticker)}
               className={styles.ticker}
             >
-              #{ticker}
+              #{ticker.replace('$', '')}
             </span>
           ))}
         </div>
