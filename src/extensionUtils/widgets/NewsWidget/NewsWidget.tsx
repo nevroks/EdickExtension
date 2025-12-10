@@ -34,30 +34,62 @@ const NewsWidgetContent = () => {
     newsApiRef.current = new NewsApi();
   }
 
+  // Начальная загрузка через API (только один раз)
   const { data, isLoading, error, isRefetching } = useQuery({
     queryKey: ['news', 5, 0],
     queryFn: () => newsApiRef.current!.getNews(5, 0),
-    refetchInterval: 30000, // Обновление каждые 30 секунд
-    staleTime: 10000, // Данные считаются свежими 10 секунд
+    refetchInterval: false,
+    staleTime: Infinity,
   });
 
+  // Подписка на новости из WebSocket через window.postMessage
+  useEffect(() => {
+    const MESSAGE_TARGET = 'EDICK_EXT_CONTENT_SCRIPT';
 
+    const handleMessage = (event: MessageEvent) => {
+      // Проверяем источник сообщения
+      if (event.data?.source !== MESSAGE_TARGET) {
+        return;
+      }
 
+      if (event.data.type === 'WS_NEWS_UPDATE') {
+        const newsItem = event.data.news as NewsItem | undefined;
+        if (newsItem) {
+          setAllNews(prevNews => {
+            // Проверяем, нет ли уже такой новости
+            const existingIds = new Set(prevNews.map(item => item.id));
+            if (!existingIds.has(newsItem.id)) {
+              return [newsItem, ...prevNews];
+            }
+            return prevNews;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  // Обновление из API при первой загрузке
   useEffect(() => {
     if (data?.data && data.data.length > 0) {
       setAllNews(prevNews => {
-        const existingIds = new Set(prevNews.map(item => item.id));
-        const newItems = data.data.filter(item => !existingIds.has(item.id));
+        // Если у нас уже есть новости из WebSocket, не перезаписываем их
+        if (prevNews.length > 0) {
+          const existingIds = new Set(prevNews.map(item => item.id));
+          const newItems = data.data.filter(item => !existingIds.has(item.id));
 
-        if (newItems.length > 0) {
-          return [...newItems, ...prevNews];
+          if (newItems.length > 0) {
+            return [...newItems, ...prevNews];
+          }
+          return prevNews;
         }
 
-        if (prevNews.length === 0) {
-          return data.data;
-        }
-
-        return prevNews;
+        return data.data;
       });
     }
   }, [data]);
