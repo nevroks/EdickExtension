@@ -214,6 +214,7 @@ export class RegistrationService {
                   group: widget.group,
                   currency: widget.currency,
                   widgetId: id,
+                  terminalWidgetId: widget.widgetId,
                 });
               };
 
@@ -227,6 +228,7 @@ export class RegistrationService {
                       group: widget.group,
                       currency: widget.currency,
                       widgetId: id,
+                      terminalWidgetId: widget.widgetId
                     });
                   },
                   unmount: cleanupWidget,

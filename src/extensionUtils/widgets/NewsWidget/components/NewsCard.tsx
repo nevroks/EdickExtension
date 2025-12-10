@@ -25,7 +25,7 @@ export const NewsCard = ({ item, onTickerClick }: NewsCardProps) => {
           {item.tikers.map((ticker, index) => (
             <span
               key={`${ticker}-${index}`}
-              onClick={() => onTickerClick?.(ticker)}
+              onClick={() => onTickerClick?.(ticker.replace('$', ''))}
               className={styles.ticker}
             >
               #{ticker.replace('$', '')}

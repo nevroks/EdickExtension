@@ -61,3 +61,19 @@ export async function showNotification(tab: TabInfo, message: string): Promise<v
     console.log('Could not show notification:', error);
   }
 }
+
+/**
+ * Находит React Fiber для элемента DOM
+ * Используется для доступа к React props и методам компонентов
+ */
+export function findReactFiber(element: HTMLElement | null): any {
+  if (!element) return null;
+  
+  for (let key in element) {
+    if (key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance')) {
+      return element[key];
+    }
+  }
+  
+  return null;
+}

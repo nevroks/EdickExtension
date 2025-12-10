@@ -3,6 +3,7 @@ import {
   useRef,
 } from 'react';
 
+import { findReactFiber } from '@/extensionUtils/helpers';
 import { NewsApi } from '@/utils/api/newsApi/NewsApi';
 import {
   QueryClient,
@@ -34,9 +35,10 @@ interface NewsWidgetProps {
   ticker?: string;
   group?: string;
   currency?: string;
+  terminalWidgetId?: string;
 }
 
-const NewsWidgetContent = ({ ticker }: NewsWidgetProps) => {
+const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
   const newsApiRef = useRef<NewsApi>(new NewsApi());
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,9 +87,28 @@ const NewsWidgetContent = ({ ticker }: NewsWidgetProps) => {
   });
 
   const handleTickerClick = useCallback((tickerValue: string) => {
-    console.log('Ticker clicked:', tickerValue);
-    // Можно добавить логику для открытия инструмента
-  }, []);
+    if (!terminalWidgetId) {
+      console.warn('widgetId не найден, невозможно изменить тикер');
+      return;
+    }
+
+    try {
+      const widgetElement = document.querySelector(`[data-widget-id="${terminalWidgetId}"]`);
+      if (widgetElement) {
+        const reactFiber = findReactFiber(widgetElement as HTMLElement);
+        const memoizedProps = reactFiber?.return?.return?.memoizedProps;
+        if (memoizedProps && memoizedProps.selectSymbol) {
+          memoizedProps.selectSymbol(tickerValue);
+        } else {
+          console.warn('Не удалось найти selectSymbol в React Fiber');
+        }
+      } else {
+        console.warn(`Не удалось найти элемент виджета с data-widget-id="${terminalWidgetId}"`);
+      }
+    } catch (err) {
+      console.error('Ошибка при изменении тикера:', err);
+    }
+  }, [terminalWidgetId]);
 
   return (
     <div className={styles.container} ref={containerRef}>
@@ -120,10 +141,10 @@ const NewsWidgetContent = ({ ticker }: NewsWidgetProps) => {
   );
 };
 
-export const NewsWidget = ({ ticker, group, currency }: NewsWidgetProps) => {
+export const NewsWidget = ({ ticker, group, currency, terminalWidgetId }: NewsWidgetProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <NewsWidgetContent ticker={ticker} group={group} currency={currency} />
+      <NewsWidgetContent ticker={ticker} group={group} currency={currency} terminalWidgetId={terminalWidgetId} />
     </QueryClientProvider>
   );
 };
