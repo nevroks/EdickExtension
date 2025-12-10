@@ -1,17 +1,21 @@
 import { io, type Socket } from "socket.io-client";
 import { logInfo, logError, logSuccess } from "./helpers";
 import type { JwtManager } from "./jwt-manager";
+import type { NewsItem } from "@/utils/api/newsApi/NewsApi";
+import type { TabManager } from "./tab-manager";
 
 export class WebSocketManager {
     private socket: Socket | null = null;
     private jwtManager: JwtManager;
+    private tabManager: TabManager;
     private isConnected: boolean = false;
     private reconnectAttempts: number = 0;
     private maxReconnectAttempts: number = 5;
     private reconnectTimeout: NodeJS.Timeout | null = null;
 
-    constructor(jwtManager: JwtManager) {
+    constructor(jwtManager: JwtManager, tabManager: TabManager) {
         this.jwtManager = jwtManager;
+        this.tabManager = tabManager;
 
         // Автоматически пытаемся подключиться при создании
         this.attemptAutoConnect();
@@ -98,12 +102,28 @@ export class WebSocketManager {
         });
 
         // Обработка бизнес-событий
-        this.socket.on('new_news', (data: any) => {
+        this.socket.on('new_news', (data: NewsItem) => {
             this.handleNewsUpdate(data);
         });
     }
-    private handleNewsUpdate(data: any) {
+    private async handleNewsUpdate(data: NewsItem) {
         logInfo('Received news update:', data);
+
+        // Отправляем новость во все зарегистрированные вкладки терминала
+        const registeredTabs = this.tabManager.getRegisteredTabs();
+        for (const tabId of registeredTabs) {
+            try {
+                await chrome.tabs.sendMessage(tabId, {
+                    type: 'WS_NEWS_UPDATE',
+                    news: data
+                });
+                logInfo(`News sent to tab ${tabId}`);
+            } catch (error) {
+                logError(`Failed to send news to tab ${tabId}:`, error);
+            }
+        }
+
+        // Создаем уведомление
         chrome.notifications.create({
             type: 'basic',
             iconUrl: '/notification-icon.png',

@@ -1,0 +1,240 @@
+.container {
+  padding: 20px;
+  color: white;
+  border-radius: 8px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px
+}
+.container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.container::-webkit-scrollbar-track:hover {
+  background-color: transparent;
+}
+
+.container::-webkit-scrollbar-track:active {
+  background-color: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.container:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+.container::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.container::-webkit-scrollbar-thumb:active {
+  background-color: #000;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.refreshing {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.error {
+  padding: 12px;
+  background: rgba(255, 0, 0, 0.2);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.newsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.newsCard {
+  padding: 12px;
+  background: rgba(15, 20, 26, 1);
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0px 2px 2.1px -1px rgba(255, 255, 255, 0.25) inset;
+  animation: slideInFade 0.4s ease-out;
+}
+
+@keyframes slideInFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.source {
+  font-size: 11px;
+  opacity: 0.8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.text {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.95;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.tickersContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.ticker {
+  font-size: 11px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ticker:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.empty {
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.searchContainer {
+  position: relative;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  background: rgba(15, 20, 26, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  color: white;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.searchInput:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.newNewsBanner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  animation: slideDown 0.3s ease-out;
+}
+
+.newNewsBanner:hover {
+  background: rgba(0, 123, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

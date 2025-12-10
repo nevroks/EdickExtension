@@ -1,5 +1,8 @@
 // Главный файл бандла виджетов
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import { BondAnalyzerWidget } from './BondAnalyzerWidget/BondAnalyzerWidget';
+import { NewsWidget } from './NewsWidget/NewsWidget';
 
 // Импорты остальных виджетов...
 
@@ -9,6 +12,7 @@ if (typeof window !== 'undefined') {
     // Реестр компонентов
     components: {
       'bond-analyzer': BondAnalyzerWidget,
+      'news': NewsWidget,
     //   'portfolio-viewer': PortfolioViewerWidget,
       // ... остальные виджеты
     },
@@ -30,22 +34,11 @@ if (typeof window !== 'undefined') {
         throw new Error(`Widget ${widgetId} is not a valid React component`);
       }
       
-      const React = (window as any).React;
-      const ReactDOM = (window as any).ReactDOM;
-      
-      if (!React || !ReactDOM) {
-        throw new Error('React not available');
-      }
-      
+      // React теперь включен в бандл, используем импортированные модули
       try {
-        if (typeof ReactDOM.createRoot === 'function') {
-          const root = ReactDOM.createRoot(container);
-          root.render(React.createElement(WidgetComponent, props));
-          (container as any).__edickExtRoot = root;
-        } else {
-          console.warn('ReactDOM.createRoot not available, using legacy render');
-          ReactDOM.render(React.createElement(WidgetComponent, props), container);
-        }
+        const root = createRoot(container);
+        root.render(React.createElement(WidgetComponent, props));
+        (container as any).__edickExtRoot = root;
       } catch (error) {
         console.error('Error rendering widget:', error);
         throw error;

@@ -1,8 +1,14 @@
-
-import type { TabInfo, RegistrationResult } from './extensionTypes.js';
-import { logInfo, showNotification, logSuccess, logError } from './helpers.js';
+import type {
+  RegistrationResult,
+  TabInfo,
+} from './extensionTypes.js';
+import {
+  logError,
+  logInfo,
+  logSuccess,
+  showNotification,
+} from './helpers.js';
 import { TabManager } from './tab-manager.js';
-
 
 export class RegistrationService {
   private tabManager: TabManager;
@@ -33,9 +39,37 @@ export class RegistrationService {
     }
   }
   private async executeRegistration(tabId: number): Promise<RegistrationResult> {
-    const registerFunction = function (): Promise<RegistrationResult> {
+    const widgetsCssUrl = chrome.runtime.getURL('widgets.css');
+    const extensionId = chrome.runtime.id;
+
+    const registerFunction = function (cssUrl: string, extensionId: string): Promise<RegistrationResult> {
       return new Promise((resolve) => {
         try {
+          const injectWidgetsCSS = () => {
+            const cssId = 'edick-ext-widgets-css';
+
+            if (document.getElementById(cssId)) {
+              return;
+            }
+
+            const link = document.createElement('link');
+            link.id = cssId;
+            link.rel = 'stylesheet';
+            link.href = cssUrl;
+            link.onerror = () => {
+              console.warn('⚠️ EdickExt: Failed to load widgets.css, using fallback');
+              // Fallback: можно попробовать загрузить через fetch и инжектировать как <style>
+            };
+            document.head.appendChild(link);
+          };
+
+          injectWidgetsCSS();
+
+          // Сохраняем Extension ID в глобальной переменной для использования в виджетах
+          if (!(window as any).__EDICK_EXTENSION_ID__) {
+            (window as any).__EDICK_EXTENSION_ID__ = extensionId;
+          }
+
           console.log('🎯 EdickExt: Registering with NEW API...');
 
           (window as any).terminal.registerExtension({
@@ -148,19 +182,42 @@ export class RegistrationService {
                     hint: 'Анализ облигаций'
                   }
                 }
+              },
+              {
+                id: 'news',
+                config: {
+                  layout: { width: 400, height: 500 },
+                  settings: {
+                    title: 'Новости',
+                    searchable: true,
+                    symbolRequired: false,
+                    noGroup: false,
+                    fullscreenAllowed: true,
+                    isSymbolResettingWithGroup: false,
+                    useSymbolInTitle: false,
+                    pinnable: true
+                  },
+                  menu: {
+                    icon: 'newspaper',
+                    label: 'Новости EdickExt',
+                    order: 2,
+                    hint: 'Последние новости'
+                  }
+                }
               }
             ];
 
-            const updateWidget = (widget: any) => {
-              renderReactWidget(widget, {
-                ticker: widget.ticker,
-                group: widget.group,
-                currency: widget.currency,
-                widgetId: widget.widgetType?.id || 'bond-analyzer'
-              });
-            };
-
             widgetConfigs.forEach(({ id, config }) => {
+              const updateWidget = (widget: any) => {
+                renderReactWidget(widget, {
+                  ticker: widget.ticker,
+                  group: widget.group,
+                  currency: widget.currency,
+                  widgetId: id,
+                  terminalWidgetId: widget.widgetId,
+                });
+              };
+
               extension.registerWidgetType(id, {
                 ...config,
                 handlers: {
@@ -170,7 +227,8 @@ export class RegistrationService {
                       ticker: widget.ticker,
                       group: widget.group,
                       currency: widget.currency,
-                      widgetId: id
+                      widgetId: id,
+                      terminalWidgetId: widget.widgetId
                     });
                   },
                   unmount: cleanupWidget,
@@ -216,6 +274,7 @@ export class RegistrationService {
     const results = await chrome.scripting.executeScript({
       target: { tabId },
       func: registerFunction,
+      args: [widgetsCssUrl, extensionId], // Передаем URL CSS и Extension ID
       world: 'MAIN'
     });
 

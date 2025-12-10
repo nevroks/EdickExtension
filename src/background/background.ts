@@ -8,8 +8,6 @@ import { TerminalChecker } from "../extensionUtils/terminal-checker";
 import { WebSocketManager } from "../extensionUtils/websocket-manager";
 import { WidgetsChecker } from "../extensionUtils/widgets-checker";
 
-
-
 console.log('EdickExt: Background script loaded');
 
 
@@ -19,7 +17,7 @@ const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
 const registrationService = new RegistrationService(tabManager);
-const websocketManager = new WebSocketManager(jwtManager);
+const websocketManager = new WebSocketManager(jwtManager, tabManager);
 
 chrome.runtime.onInstalled.addListener(() => {
   logInfo('Extension installed');
@@ -55,13 +53,37 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.
   }
 });
 
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   switch (request.type) {
-//     case 'WS_RECONNECT':
-//       websocketManager.reconnect();
-//       break;
-//   }
-// });
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  switch (request.type) {
+    case 'GET_ACCESS_TOKEN': {
+      // Возвращаем accessToken из JwtManager
+      const tokens = jwtManager.getTokens();
+      sendResponse({ accessToken: tokens?.accessToken || null });
+      return true; // Указываем, что ответ будет асинхронным
+    }
+
+    case 'REFRESH_TOKENS': {
+      jwtManager.refreshTokens().then((success) => {
+        if (success) {
+          const tokens = jwtManager.getTokens();
+          sendResponse({ tokens: tokens || null });
+        } else {
+          sendResponse({ tokens: null });
+        }
+      }).catch((error) => {
+        console.error('Background: Error refreshing tokens:', error);
+        sendResponse({ tokens: null });
+      });
+      return true;
+    }
+
+     case 'WS_RECONNECT': {
+       websocketManager.reconnect();
+       sendResponse({ success: true });
+       return true;
+     }
+  }
+});
 
 chrome.runtime.onSuspend.addListener(() => {
   terminalChecker.cleanup();
