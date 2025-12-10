@@ -17,7 +17,7 @@ const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
 const registrationService = new RegistrationService(tabManager);
-const websocketManager = new WebSocketManager(jwtManager);
+const websocketManager = new WebSocketManager(jwtManager, tabManager);
 
 chrome.runtime.onInstalled.addListener(() => {
   logInfo('Extension installed');
@@ -77,11 +77,11 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       return true;
     }
 
-    // case 'WS_RECONNECT': {
-    //   websocketManager.reconnect();
-    //   sendResponse({ success: true });
-    //   return true;
-    // }
+     case 'WS_RECONNECT': {
+       websocketManager.reconnect();
+       sendResponse({ success: true });
+       return true;
+     }
   }
 });
 

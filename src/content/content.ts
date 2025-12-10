@@ -40,6 +40,22 @@ window.addEventListener('message', (event) => {
       }
     );
   }
+
+});
+
+// Слушаем сообщения от background script о новых новостях
+chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
+  if (message.type === 'WS_NEWS_UPDATE') {
+    // Пересылаем новость в виджет через window.postMessage
+    window.postMessage(
+      {
+        source: MESSAGE_TARGET,
+        type: 'WS_NEWS_UPDATE',
+        news: message.news,
+      },
+      '*'
+    );
+  }
 });
 
 // Функция для проверки загрузки виджетов

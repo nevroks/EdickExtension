@@ -91,13 +91,23 @@ export class NewsApi {
         );
     }
 
-    async getNews(limit: number = 5, offset: number = 0) {
+    async getNews(limit: number = 5, offset: number = 0, tiker?: string, search?: string) {
         try {
+            const params: Record<string, string | number> = {
+                limit,
+                offset
+            };
+
+            if (tiker) {
+                params.tiker = tiker;
+            }
+
+            if (search) {
+                params.search = search;
+            }
+
             const { data } = await this.api.get<NewsResponse>(`/news`, {
-                params: {
-                    limit,
-                    offset
-                }
+                params
             })
             return data
         } catch (error) {

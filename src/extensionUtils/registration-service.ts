@@ -207,16 +207,16 @@ export class RegistrationService {
               }
             ];
 
-            const updateWidget = (widget: any) => {
-              renderReactWidget(widget, {
-                ticker: widget.ticker,
-                group: widget.group,
-                currency: widget.currency,
-                widgetId: widget.widgetType?.id || 'bond-analyzer',
-              });
-            };
-
             widgetConfigs.forEach(({ id, config }) => {
+              const updateWidget = (widget: any) => {
+                renderReactWidget(widget, {
+                  ticker: widget.ticker,
+                  group: widget.group,
+                  currency: widget.currency,
+                  widgetId: id,
+                });
+              };
+
               extension.registerWidgetType(id, {
                 ...config,
                 handlers: {
