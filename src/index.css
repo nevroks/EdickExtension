@@ -204,21 +204,58 @@ legend {
   filter: blur(180px);
   z-index: 1;
 }
-.App-logo-container{
+
+.App-logo-container {
   mix-blend-mode: soft-light;
   position: absolute;
   z-index: 3;
   display: flex;
   flex: 1;
 }
-.AuthScreen-logo {
-  
-  
-}
+
+.AuthScreen-logo {}
 
 .App-content {
   display: flex;
   flex: 1;
   height: 100%;
   z-index: 4;
+}
+
+.MainApp-layout {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.MainApp-layout-nav {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 17px 30px 16px;
+  top: 45px;
+  left: calc(100% / 2 - 402px / 2);
+  width: 402px;
+  height: 61px;
+  border-radius: 30px;
+  box-shadow: inset 0px 4px 6.099999904632568px 0px rgba(150, 68, 196, 0.14), 0px 145px 58px 0px rgba(0, 0, 0, 0.04), 0px 82px 49px 0px rgba(0, 0, 0, 0.15), 0px 36px 36px 0px rgba(0, 0, 0, 0.26), 0px 9px 20px 0px rgba(0, 0, 0, 0.29);
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.MainApp-layout-nav::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -21px;
+  left: -99px;
+  width: 600px;
+  height: 476px;
+  box-shadow: 72px 441px 125px 0px rgba(0, 0, 0, 0), 46px 282px 114px 0px rgba(0, 0, 0, 0.01), 26px 159px 96px 0px rgba(0, 0, 0, 0.05), 11px 71px 71px 0px rgba(0, 0, 0, 0.09), 3px 18px 39px 0px rgba(0, 0, 0, 0.1);
+}
+
+.MainApp-layout-bgImg {
+  position: absolute;
+  bottom: -10px;
+  left: -50px;
 }

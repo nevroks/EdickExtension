@@ -157,9 +157,9 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                     setSuccessFormAnimationStep("3");
                     setTimeout(() => {
                         resolve();
-                        setTimeout(() => {
-                            setSuccessFormAnimationStep("0");
-                        }, 1)
+                        // setTimeout(() => {
+                        //     setSuccessFormAnimationStep("0");
+                        // }, 1)
                     }, 800)
                 }, 1200);
 
@@ -191,11 +191,11 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
 
 
-    const [jwtTokens, setJwtTokens] = useChromeStorage('jwt-tokens', {
-        accessToken: "",
-        refreshToken: ""
-    })
-    const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
+    // const [jwtTokens, setJwtTokens] = useChromeStorage('jwt-tokens', {
+    //     accessToken: "",
+    //     refreshToken: ""
+    // })
+    // const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
 
     const { mutations: {
         register: { mutateAsync: registerFunc, error: registerError, isPending: isRegisterPending },
@@ -205,19 +205,21 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
     const handleRegister = (dto: RegisterDto) => {
         registerFunc(dto).then(data => {
-            setJwtTokens({
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken
-            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
+            showSuccessAnimation()
+            // setJwtTokens({
+            //     accessToken: data.accessToken,
+            //     refreshToken: data.refreshToken
+            // }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
     const handleLogin = (dto: LoginDto) => {
         loginFunc(dto).then(data => {
-            setJwtTokens({
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken
-            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
+            showSuccessAnimation()
+            // setJwtTokens({
+            //     accessToken: data.accessToken,
+            //     refreshToken: data.refreshToken
+            // }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
@@ -284,7 +286,6 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                         }}
                         exit={{
                             opacity: 0,
-                            y: 400,
                             transition: { duration: 0.8 }
                         }}
                     >
