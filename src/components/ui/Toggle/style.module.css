@@ -1,0 +1,102 @@
+.toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+}
+
+.toggle-container:focus-visible .toggle-switch {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+}
+
+
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+ы.toggle-switch {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-medium .toggle-switch {
+    width: 23px;
+    height: 13px;
+}
+
+
+
+.toggle-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 9999px;
+    background: #989898;
+    transition: all 0.3s ease;
+}
+
+.toggle-track-checked {
+    background: #17CF39;
+}
+
+
+.toggle-thumb {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: calc(50% - 1px);
+    height: calc(100% - 2px);
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-disabled .toggle-thumb {
+    box-shadow: 0px 0px 3.4000000953674316px 0px rgba(0, 0, 0, 0.44);
+    background: rgba(153, 153, 153, 1);
+}
+
+.toggle-thumb-checked {
+    left: calc(50%);
+    background: white;
+}
+
+.toggle-thumb {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-icon {
+    width: 60%;
+    height: 60%;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+
+
+.toggle-label {
+    color: rgba(152, 152, 152, 1);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19px;
+    transition: color 0.2s ease;
+}
+
+.toggle-label.toggle-checked {
+    color: rgba(255, 255, 255, 1);
+}
+
+
+
+.toggle-container.toggle-disabled {
+    cursor: not-allowed;
+}

@@ -14,6 +14,8 @@ import mainScreenBg from './assets/mainScreenBgImg.png';
 import tgIcon from './assets/icons/tgIcon.svg';
 import { useState, type ReactNode } from 'react';
 import { Link } from '@/ui';
+import classNames from 'classnames';
+import SettingsScreen from './screens/SettingsScreen';
 
 
 
@@ -21,22 +23,39 @@ const queryClient = new QueryClient()
 
 const MainAppLayout = ({ children }: { children: ReactNode }) => {
 
-
+  const { currentView } = useNavigation()
 
   return (
     <ScreensLayoutWrapper path="main">
       <div className='MainApp-layout'>
         <motion.div className='MainApp-layout-nav'>
-          <Link to="main/terminal">Главная</Link>
-          <Link to="main/settings">Настройки</Link>
-          <Link to="main/subscription">Выход</Link>
+          <Link
+            className={classNames("MainApp-layout-nav-item", { "MainApp-layout-nav-item-active": currentView === "main/subscription" })}
+            to="main/subscription">Подписка</Link>
+          <Link
+            className={classNames("MainApp-layout-nav-item", { "MainApp-layout-nav-item-active": currentView === "main/settings" })}
+            to="main/settings">Настройки</Link>
+          <Link
+            className={classNames("MainApp-layout-nav-item", { "MainApp-layout-nav-item-active": currentView === "main/terminal" })}
+            to="main/terminal">Терминал</Link>
           <a href="">
             <img src={tgIcon} alt="tg-icon" />
           </a>
 
         </motion.div>
         <div className='MainApp-layout-content'>
-          {children}
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={currentView} // Ключ изменяется при смене currentView, что запускает анимацию
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              style={{ width: '100%', height: '100%' }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
         <motion.img
           className='MainApp-layout-bgImg'
@@ -84,17 +103,16 @@ const App = () => {
       </AnimatePresence>
 
       <div className='App-content'>
-        {/* <ScreenWrapper content={<AuthScreen
+        <ScreenWrapper content={<AuthScreen
           animationStep={authScreenAnimationStep}
           setAnimationStep={setAuthScreenAnimationStep}
           successFormAnimationStep={successAuthFormAnimationStep}
           setSuccessFormAnimationStep={setSuccessAuthFormAnimationStep}
-        />} path={'auth'} /> */}
+        />} path={'auth'} />
         <MainAppLayout>
-          <></>
-          {/* <ScreenWrapper content={<AuthSecuredScreen screen={<MainScreen />} />} path={'main/settings'} />
+          <ScreenWrapper content={<AuthSecuredScreen screen={<SettingsScreen />} />} path={'main/settings'} />
           <ScreenWrapper content={<AuthSecuredScreen screen={<MainScreen />} />} path={'main/terminal'} />
-          <ScreenWrapper content={<AuthSecuredScreen screen={<MainScreen />} />} path={'main/subscription'} /> */}
+          <ScreenWrapper content={<AuthSecuredScreen screen={<MainScreen />} />} path={'main/subscription'} />
         </MainAppLayout>
 
       </div>

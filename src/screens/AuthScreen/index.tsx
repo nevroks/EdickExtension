@@ -191,11 +191,11 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
 
 
-    // const [jwtTokens, setJwtTokens] = useChromeStorage('jwt-tokens', {
-    //     accessToken: "",
-    //     refreshToken: ""
-    // })
-    // const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
+    const [jwtTokens, setJwtTokens] = useChromeStorage('jwt-tokens', {
+        accessToken: "",
+        refreshToken: ""
+    })
+    const [isAuth, setIsAuth] = useChromeStorage('isAuth', false)
 
     const { mutations: {
         register: { mutateAsync: registerFunc, error: registerError, isPending: isRegisterPending },
@@ -205,21 +205,21 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
     const handleRegister = (dto: RegisterDto) => {
         registerFunc(dto).then(data => {
-            showSuccessAnimation()
-            // setJwtTokens({
-            //     accessToken: data.accessToken,
-            //     refreshToken: data.refreshToken
-            // }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
+           
+            setJwtTokens({
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
     const handleLogin = (dto: LoginDto) => {
         loginFunc(dto).then(data => {
-            showSuccessAnimation()
-            // setJwtTokens({
-            //     accessToken: data.accessToken,
-            //     refreshToken: data.refreshToken
-            // }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
+            
+            setJwtTokens({
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+            }).then(() => showSuccessAnimation().then(() => setIsAuth(true)).then(() => navigateTo('main')));
         })
     }
 
