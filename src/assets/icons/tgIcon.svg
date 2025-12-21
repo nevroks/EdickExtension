@@ -1,0 +1,48 @@
+<svg viewBox="0 0 26.8853 28" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26.885254" height="28.000000" fill="none" customFrame="#000000">
+	<defs>
+		<g id="pixso_custom_effect_0">
+			<effect x="0.000000" y="1.000000" visibility="visible" fill="rgb(0,0,0)" fill-opacity="0" effectType="dropShadow" showShadowBehind="1" stdDeviation="2" radius="0" />
+			<effect x="0.000000" y="3.000000" visibility="visible" fill="rgb(0,0,0)" fill-opacity="0" effectType="dropShadow" showShadowBehind="1" stdDeviation="3" radius="0" />
+			<effect x="0.000000" y="7.000000" visibility="visible" fill="rgb(0,0,0)" fill-opacity="0" effectType="dropShadow" showShadowBehind="1" stdDeviation="4" radius="0" />
+			<effect x="0.000000" y="13.000000" visibility="visible" fill="rgb(0,0,0)" fill-opacity="0" effectType="dropShadow" showShadowBehind="1" stdDeviation="5" radius="0" />
+			<effect x="0.000000" y="20.000000" visibility="visible" fill="rgb(0,0,0)" fill-opacity="0" effectType="dropShadow" showShadowBehind="1" stdDeviation="6" radius="0" />
+		</g>
+		<filter id="filter_0" width="26.885254" height="28.000000" x="0.000000" y="0.000000" filterUnits="userSpaceOnUse" customEffect="url(#pixso_custom_effect_0)" color-interpolation-filters="sRGB">
+			<feFlood flood-opacity="0" result="BackgroundImageFix" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="0.000000" dy="1.000000" in="hardAlpha" />
+			<feGaussianBlur stdDeviation="0.666666687" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+			<feBlend result="effect_dropShadow_1" in2="BackgroundImageFix" mode="normal" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="0.000000" dy="3.000000" in="hardAlpha" />
+			<feGaussianBlur stdDeviation="1" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+			<feBlend result="effect_dropShadow_2" in2="effect_dropShadow_1" mode="normal" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="0.000000" dy="7.000000" in="hardAlpha" />
+			<feGaussianBlur stdDeviation="1.33333337" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+			<feBlend result="effect_dropShadow_3" in2="effect_dropShadow_2" mode="normal" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="0.000000" dy="13.000000" in="hardAlpha" />
+			<feGaussianBlur stdDeviation="1.66666663" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+			<feBlend result="effect_dropShadow_4" in2="effect_dropShadow_3" mode="normal" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="0.000000" dy="20.000000" in="hardAlpha" />
+			<feGaussianBlur stdDeviation="2" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+			<feBlend result="effect_dropShadow_5" in2="effect_dropShadow_4" mode="normal" />
+			<feBlend result="shape" in="SourceGraphic" in2="effect_dropShadow_5" mode="normal" />
+		</filter>
+		<linearGradient id="paint_linear_0" x1="17.1674995" x2="17.2731457" y1="24.2251186" y2="-1.36894608" gradientUnits="userSpaceOnUse">
+			<stop stop-color="rgb(28.8429,13.3382,38.0048)" offset="0" stop-opacity="1" />
+			<stop stop-color="rgb(80,36,106)" offset="1" stop-opacity="1" />
+		</linearGradient>
+	</defs>
+	<g id="Artboard" filter="url(#filter_0)">
+		<path id="Oval" d="M13.4427 28C20.8669 28 26.8854 21.732 26.8854 14C26.8854 6.26801 20.8669 0 13.4427 0C6.01851 0 0 6.26801 0 14C0 21.732 6.01851 28 13.4427 28Z" fill="url(#paint_linear_0)" fill-rule="evenodd" />
+		<path id="Path-3" d="M6.09356 13.8474C10.0091 12.0592 12.6265 10.9034 13.9247 10.3365C17.6518 8.72276 18.4265 8.43927 18.9291 8.43927C19.0337 8.43927 19.285 8.46108 19.4525 8.59192C19.5782 8.70095 19.62 8.8536 19.641 8.96263C19.6619 9.07167 19.6829 9.31154 19.6619 9.5078C19.4525 11.7103 18.594 17.0966 18.1334 19.5608C17.9449 20.6075 17.568 20.9564 17.2121 21C16.4373 21.0654 15.8301 20.4548 15.0763 19.9533C13.9037 19.1464 13.2337 18.6449 12.0821 17.8598C10.7629 16.9439 11.6214 16.4424 12.3752 15.6355C12.5637 15.4175 16.0186 12.1682 16.0814 11.8629C16.0814 11.8193 16.1023 11.6885 16.0186 11.6231C15.9348 11.5576 15.8301 11.5795 15.7464 11.6013C15.6207 11.6231 13.7362 12.9315 10.0719 15.5047C9.52753 15.8972 9.04593 16.0717 8.60622 16.0717C8.12463 16.0717 7.20332 15.7882 6.51234 15.5483C5.67479 15.2648 5.00474 15.1122 5.06756 14.6324C5.13038 14.3707 5.4654 14.1091 6.09356 13.8474Z" fill="rgb(255,255,255)" fill-rule="evenodd" />
+	</g>
+</svg>

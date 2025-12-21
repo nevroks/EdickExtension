@@ -157,9 +157,9 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                     setSuccessFormAnimationStep("3");
                     setTimeout(() => {
                         resolve();
-                        setTimeout(() => {
-                            setSuccessFormAnimationStep("0");
-                        }, 1)
+                        // setTimeout(() => {
+                        //     setSuccessFormAnimationStep("0");
+                        // }, 1)
                     }, 800)
                 }, 1200);
 
@@ -205,6 +205,7 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
     const handleRegister = (dto: RegisterDto) => {
         registerFunc(dto).then(data => {
+           
             setJwtTokens({
                 accessToken: data.accessToken,
                 refreshToken: data.refreshToken
@@ -214,6 +215,7 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
 
     const handleLogin = (dto: LoginDto) => {
         loginFunc(dto).then(data => {
+            
             setJwtTokens({
                 accessToken: data.accessToken,
                 refreshToken: data.refreshToken
@@ -284,7 +286,6 @@ const AuthScreen = ({ setAnimationStep, animationStep, successFormAnimationStep,
                         }}
                         exit={{
                             opacity: 0,
-                            y: 400,
                             transition: { duration: 0.8 }
                         }}
                     >
