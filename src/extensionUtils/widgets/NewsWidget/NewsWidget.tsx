@@ -1,6 +1,7 @@
 import {
   useCallback,
   useRef,
+  useState,
 } from 'react';
 
 import { findReactFiber } from '@/extensionUtils/helpers';
@@ -8,12 +9,15 @@ import { NewsApi } from '@/utils/api/newsApi/NewsApi';
 import {
   QueryClient,
   QueryClientProvider,
+  useQueryClient,
 } from '@tanstack/react-query';
 
+import { ActionButtons } from '../shared/ActionButtons/ActionButtons';
 import { NewNewsBanner } from './components/NewNewsBanner';
 import { NewsHeader } from './components/NewsHeader';
 import { NewsList } from './components/NewsList';
 import { NewsLoadingState } from './components/NewsLoadingState';
+import { NewsSettingsModal } from './components/NewsSettingsModal';
 import { SearchInput } from './components/SearchInput';
 import { useNewsPagination } from './hooks/useNewsPagination';
 import { useNewsScroll } from './hooks/useNewsScroll';
@@ -41,6 +45,9 @@ interface NewsWidgetProps {
 const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
   const newsApiRef = useRef<NewsApi>(new NewsApi());
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [tickerBindingEnabled, setTickerBindingEnabled] = useState(false);
 
   const {
     allNews,
@@ -110,6 +117,25 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
     }
   }, [terminalWidgetId]);
 
+  const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: ['news'],
+    });
+  }, [queryClient]);
+
+  const handleSettingsClick = useCallback(() => {
+    setIsSettingsModalOpen(true);
+  }, []);
+
+  const handleSettingsClose = useCallback(() => {
+    setIsSettingsModalOpen(false);
+  }, []);
+
+  const handleTickerBindingChange = useCallback((enabled: boolean) => {
+    setTickerBindingEnabled(enabled);
+    // TODO
+  }, []);
+
   return (
     <div className={styles.container} ref={containerRef}>
       {newNewsCount > 0 && isScrolledDown && (
@@ -119,7 +145,14 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
         />
       )}
 
-      <NewsHeader ticker={ticker} isRefetching={isRefetching} />
+      <div className={styles.headerContainer}>
+        <NewsHeader ticker={ticker} isRefetching={isRefetching} />
+        <ActionButtons
+          onRefresh={handleRefresh}
+          onSettings={handleSettingsClick}
+          isRefreshing={isRefetching}
+        />
+      </div>
 
       <SearchInput value={searchQuery} onChange={setSearchQuery} />
 
@@ -137,6 +170,13 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
           onTickerClick={handleTickerClick}
         />
       )}
+
+      <NewsSettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={handleSettingsClose}
+        tickerBindingEnabled={tickerBindingEnabled}
+        onTickerBindingChange={handleTickerBindingChange}
+      />
     </div>
   );
 };

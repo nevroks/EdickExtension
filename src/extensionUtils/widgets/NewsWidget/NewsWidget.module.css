@@ -6,7 +6,6 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  font-family: Arial, sans-serif;
   overflow: auto;
   --scrollbars-thumb-color: var(--pro-text-color);
   --scrollbars-thumb-opacity: 0.2;
@@ -49,16 +48,19 @@
 .container::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.header {
+.headerContainer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
 }
 
 .title {
@@ -189,7 +191,6 @@
   border-radius: 7px;
   color: white;
   font-size: 13px;
-  font-family: Arial, sans-serif;
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
