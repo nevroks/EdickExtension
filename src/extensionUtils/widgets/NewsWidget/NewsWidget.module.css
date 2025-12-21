@@ -15,6 +15,10 @@
   user-select: text;
 }
 
+.containerNoScroll {
+  overflow: hidden;
+}
+
 .container::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -95,6 +99,108 @@
   flex-direction: column;
   gap: 12px;
   flex: 1;
+}
+
+.newsSectionsContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+.unfilteredNewsSection {
+  flex: 2;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.tickerFilteredNewsSection {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.tickerNewsHeader {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.tickerFilteredNewsList {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-thumb:hover {
+  background: #888;
 }
 
 .newsCard {

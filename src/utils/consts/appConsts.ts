@@ -3,7 +3,8 @@ export const CHROME_STORAGE_KEYS = {
     'T-key': 'T-key',
     'jwt-tokens': 'jwt-tokens',
     'isAuth': 'isAuth',
-    'ws-news': 'ws-news'
+    'ws-news': 'ws-news',
+    'news-ticker-binding-enabled': 'news-ticker-binding-enabled'
 }
 
 export const APP_BACKEND_URL = 'https://extension.api.askerovgroup.ru'

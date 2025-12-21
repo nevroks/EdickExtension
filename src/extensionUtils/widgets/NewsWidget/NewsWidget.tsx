@@ -6,6 +6,7 @@ import {
 
 import { findReactFiber } from '@/extensionUtils/helpers';
 import { NewsApi } from '@/utils/api/newsApi/NewsApi';
+import { useLocalStorage } from '@/utils/hooks/useLocalStorage';
 import {
   QueryClient,
   QueryClientProvider,
@@ -47,11 +48,13 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [tickerBindingEnabled, setTickerBindingEnabled] = useState(false);
+  const [tickerBindingEnabled, setTickerBindingEnabled] = useLocalStorage('news-ticker-binding-enabled', false);
 
   const {
     allNews,
     setAllNews,
+    tickerFilteredNews,
+    setTickerFilteredNews,
     searchQuery,
     setSearchQuery,
     debouncedSearch,
@@ -60,11 +63,15 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
     isRefetching,
     currentOffset,
     setCurrentOffset,
+    tickerCurrentOffset,
+    setTickerCurrentOffset,
     hasNextPage,
     setHasNextPage,
+    tickerHasNextPage,
+    setTickerHasNextPage,
     formattedTicker,
     addNewsIfNotExists,
-  } = useNewsState({ ticker, newsApiRef });
+  } = useNewsState({ ticker, newsApiRef, tickerBindingEnabled });
 
   const {
     isScrolledDown,
@@ -80,7 +87,7 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
     onNewNewsAdded: incrementNewNewsCount,
   });
 
-  const { isLoadingMore, lastNewsCardRef } = useNewsPagination({
+  const { isLoadingMore, lastNewsCardRef, isLoadingMoreTicker, lastTickerNewsCardRef } = useNewsPagination({
     newsApiRef,
     ticker,
     debouncedSearch,
@@ -91,6 +98,12 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
     setHasNextPage,
     setAllNews,
     isLoading,
+    tickerBindingEnabled,
+    tickerCurrentOffset,
+    setTickerCurrentOffset,
+    tickerHasNextPage,
+    setTickerHasNextPage,
+    setTickerFilteredNews,
   });
 
   const handleTickerClick = useCallback((tickerValue: string) => {
@@ -133,11 +146,13 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
 
   const handleTickerBindingChange = useCallback((enabled: boolean) => {
     setTickerBindingEnabled(enabled);
-    // TODO
-  }, []);
+  }, [setTickerBindingEnabled]);
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div 
+      className={`${styles.container} ${tickerBindingEnabled && ticker ? styles.containerNoScroll : ''}`} 
+      ref={containerRef}
+    >
       {newNewsCount > 0 && isScrolledDown && (
         <NewNewsBanner
           count={newNewsCount}
@@ -146,7 +161,7 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
       )}
 
       <div className={styles.headerContainer}>
-        <NewsHeader ticker={ticker} isRefetching={isRefetching} />
+        {!tickerBindingEnabled && <NewsHeader ticker={ticker} isRefetching={isRefetching} />}
         <ActionButtons
           onRefresh={handleRefresh}
           onSettings={handleSettingsClick}
@@ -156,19 +171,62 @@ const NewsWidgetContent = ({ ticker, terminalWidgetId }: NewsWidgetProps) => {
 
       <SearchInput value={searchQuery} onChange={setSearchQuery} />
 
-      <NewsLoadingState
-        isLoading={isLoading}
-        error={error}
-        isEmpty={!isLoading && !error && allNews.length === 0}
-      />
+      {tickerBindingEnabled && ticker ? (
+        <>
+          <NewsLoadingState
+            isLoading={isLoading}
+            error={error}
+            isEmpty={!isLoading && !error && allNews.length === 0 && tickerFilteredNews.length === 0}
+          />
 
-      {!isLoading && !error && allNews.length > 0 && (
-        <NewsList
-          news={allNews}
-          isLoadingMore={isLoadingMore}
-          lastNewsCardRef={lastNewsCardRef}
-          onTickerClick={handleTickerClick}
-        />
+          <div className={styles.newsSectionsContainer}>
+            <div className={styles.unfilteredNewsSection}>
+              {!isLoading && !error && (
+                <NewsList
+                  news={allNews}
+                  isLoadingMore={isLoadingMore}
+                  lastNewsCardRef={lastNewsCardRef}
+                  onTickerClick={handleTickerClick}
+                />
+              )}
+            </div>
+
+            {ticker && (
+              <div className={styles.tickerFilteredNewsSection}>
+                <div className={styles.tickerNewsHeader}>
+                  Новости по тикеру: {ticker}
+                </div>
+                <div className={styles.tickerFilteredNewsList}>
+                  {!isLoading && !error && (
+                    <NewsList
+                      news={tickerFilteredNews}
+                      isLoadingMore={isLoadingMoreTicker}
+                      lastNewsCardRef={lastTickerNewsCardRef}
+                      onTickerClick={handleTickerClick}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <NewsLoadingState
+            isLoading={isLoading}
+            error={error}
+            isEmpty={!isLoading && !error && allNews.length === 0}
+          />
+
+          {!isLoading && !error && allNews.length > 0 && (
+            <NewsList
+              news={allNews}
+              isLoadingMore={isLoadingMore}
+              lastNewsCardRef={lastNewsCardRef}
+              onTickerClick={handleTickerClick}
+            />
+          )}
+        </>
       )}
 
       <NewsSettingsModal
