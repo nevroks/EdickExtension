@@ -1,4 +1,7 @@
-.Link {}
+.Link {
+    pointer-events: all;
+    cursor: pointer;
+}
 
 .Link p {
     color: rgba(255, 255, 255, 1);

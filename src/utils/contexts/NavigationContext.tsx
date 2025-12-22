@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type View = 'main' | 'settings' | 'about' | 'profile' | 'auth';
+export type View = "main" | 'main/settings' | 'main/subscription' | 'main/terminal' | 'auth';
 
 export interface NavigationContextType {
     currentView: View;
@@ -10,7 +10,7 @@ export interface NavigationContextType {
 
 // Дефолтные значения
 const defaultContext: NavigationContextType = {
-    currentView: 'main',
+    currentView: 'main/settings',
     navigateTo: () => {
         console.warn('NavigationContext not implemented');
     },
@@ -28,7 +28,7 @@ interface NavigationProviderProps {
 // Провайдер контекста
 export function NavigationProvider({
     children,
-    initialView = 'main'
+    initialView = 'main/settings'
 }: NavigationProviderProps) {
     const [currentView, setCurrentView] = useState<View>(initialView);
 

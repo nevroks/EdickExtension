@@ -1,0 +1,17 @@
+.SettingsScreen {
+    display: flex;
+    flex: 1;
+}
+
+.SettingsScreen-content {
+    display: flex;
+    flex-direction: column;
+
+    row-gap: 6px;
+
+}
+.lock-container{
+    display: flex;
+    align-items: center;
+    column-gap: 4px
+}

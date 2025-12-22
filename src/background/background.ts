@@ -1,3 +1,4 @@
+import { UserAppSettingsManager } from "@/extensionUtils/userAppSettings-manager";
 import type { TabInfo } from "../extensionUtils/extensionTypes";
 import { isTerminalUrl, logInfo } from "../extensionUtils/helpers";
 import { JwtManager } from "../extensionUtils/jwt-manager";
@@ -13,6 +14,7 @@ console.log('EdickExt: Background script loaded');
 
 const jwtManager = new JwtManager();
 const tabManager = new TabManager();
+const userAppSettingsManager = new UserAppSettingsManager();
 const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
@@ -77,11 +79,11 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       return true;
     }
 
-     case 'WS_RECONNECT': {
-       websocketManager.reconnect();
-       sendResponse({ success: true });
-       return true;
-     }
+    case 'WS_RECONNECT': {
+      websocketManager.reconnect();
+      sendResponse({ success: true });
+      return true;
+    }
   }
 });
 
