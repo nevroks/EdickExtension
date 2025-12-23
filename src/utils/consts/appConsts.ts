@@ -6,6 +6,7 @@ export const CHROME_STORAGE_KEYS = {
     'jwt-tokens': 'jwt-tokens',
     'isAuth': 'isAuth',
     'ws-news': 'ws-news',
+    'news-ticker-binding-enabled': 'news-ticker-binding-enabled',
     'userAppSettings': 'userAppSettings'
 }
 

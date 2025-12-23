@@ -1,12 +1,12 @@
 .container {
   padding: 20px;
+  padding-top: 4px;
   color: white;
   border-radius: 8px;
   height: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  font-family: Arial, sans-serif;
   overflow: auto;
   --scrollbars-thumb-color: var(--pro-text-color);
   --scrollbars-thumb-opacity: 0.2;
@@ -14,6 +14,10 @@
   --scrollbars-thumb-active-opacity: 0.56;
   -webkit-user-select: text;
   user-select: text;
+}
+
+.containerNoScroll {
+  overflow: hidden;
 }
 
 .container::-webkit-scrollbar {
@@ -49,16 +53,19 @@
 .container::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
-.header {
+.headerContainer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 12px;
 }
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  flex: 1;
 }
 
 .title {
@@ -95,6 +102,109 @@
   flex: 1;
 }
 
+.newsSectionsContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+.unfilteredNewsSection {
+  flex: 2;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.unfilteredNewsSection:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.unfilteredNewsSection::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.tickerFilteredNewsSection {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+.tickerNewsHeader {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.tickerFilteredNewsList {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.tickerFilteredNewsList:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.tickerFilteredNewsList::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
 .newsCard {
   padding: 12px;
   background: rgba(15, 20, 26, 1);
@@ -125,12 +235,52 @@
   letter-spacing: 0.5px;
 }
 
+.textContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .text {
   margin: 0;
   font-size: 13px;
   opacity: 0.95;
   line-height: 1.5;
-  flex: 1;
+  transition: max-height 0.3s ease-out, -webkit-line-clamp 0.3s ease-out;
+  overflow: hidden;
+}
+
+.newsCardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textCollapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-height: calc(1.5em * 2);
+}
+
+.expandButton {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: rgba(119, 119, 119, 1);
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-top: 6px;
+}
+
+.expandButton:hover {
+  opacity: 1;
+  color: #fff;
 }
 
 .tickersContainer {
@@ -189,7 +339,6 @@
   border-radius: 7px;
   color: white;
   font-size: 13px;
-  font-family: Arial, sans-serif;
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
