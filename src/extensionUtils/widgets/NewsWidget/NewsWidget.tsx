@@ -36,7 +36,7 @@ const queryClient = new QueryClient({
   },
 });
 
-interface NewsWidgetProps {
+export interface NewsWidgetProps {
   ticker?: string;
   group?: string;
   currency?: string;

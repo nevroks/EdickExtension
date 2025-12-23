@@ -1,0 +1,69 @@
+.ApplicationWidget {
+    display: grid;
+    grid-template-rows: 35px 1fr;
+    grid-template-columns: 1fr;
+    background: rgb(30, 44, 57);
+}
+
+.ApplicationWidget-tabs {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0 10px;
+}
+
+.ApplicationWidget-tabs::after {
+    content: "";
+
+    width: 100%;
+    z-index: 1;
+    height: 3px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(57, 75, 91, 1);
+}
+
+.ApplicationWidget-tabs-item {
+    width: 100%;
+    position: relative;
+    color: rgba(125, 125, 125, 1);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 18px;
+    /* это предустановленый стиль от тинька */
+    margin-bottom: 0 !important;
+    /* это предустановленый стиль от тинька */
+    text-align: center;
+
+
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.ApplicationWidget-tabs-item:nth-child(1) {
+    padding-left: 11px;
+
+}
+
+.ApplicationWidget-tabs-item:nth-child(4) {
+    padding-right: 11px;
+
+}
+
+.ApplicationWidget-tabs-item.active {
+    color: rgb(255, 255, 255);
+}
+
+.ApplicationWidget-tabs-item.active::after {
+    content: "";
+
+    z-index: 2;
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(19, 116, 244, 1);
+}

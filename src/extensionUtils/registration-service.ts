@@ -204,6 +204,28 @@ export class RegistrationService {
                     hint: 'Последние новости'
                   }
                 }
+              },
+              {
+                id: 'application',
+                config: {
+                  layout: { width: 400, height: 500 },
+                  settings: {
+                    title: 'Заявки',
+                    searchable: true,
+                    symbolRequired: false,
+                    noGroup: false,
+                    fullscreenAllowed: true,
+                    isSymbolResettingWithGroup: false,
+                    useSymbolInTitle: false,
+                    pinnable: true
+                  },
+                  menu: {
+                    icon: 'newspaper',
+                    label: 'Заявки EdickExt',
+                    order: 2,
+                    hint: 'Последние заявки'
+                  }
+                }
               }
             ];
 
