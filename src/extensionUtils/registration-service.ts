@@ -39,10 +39,25 @@ export class RegistrationService {
     }
   }
   private async executeRegistration(tabId: number): Promise<RegistrationResult> {
+    // Гарантируем, что widgets.iife.js загружен в MAIN world
+    try {
+      logInfo('Injecting widgets.iife.js to MAIN world before registration...');
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ['widgets.iife.js'],
+        world: 'MAIN'
+      });
+      logSuccess('Widgets script injected successfully');
+    } catch (error) {
+      logError('Failed to inject widgets script:', error);
+      // Продолжаем, возможно скрипт уже загружен
+    }
+
     const widgetsCssUrl = chrome.runtime.getURL('widgets.css');
+    const widgetsScriptUrl = chrome.runtime.getURL('widgets.iife.js');
     const extensionId = chrome.runtime.id;
 
-    const registerFunction = function (cssUrl: string, extensionId: string): Promise<RegistrationResult> {
+    const registerFunction = function (cssUrl: string, extensionId: string, scriptUrl: string): Promise<RegistrationResult> {
       return new Promise((resolve) => {
         try {
           const injectWidgetsCSS = () => {
@@ -79,19 +94,83 @@ export class RegistrationService {
             console.log("Extension:", extension);
 
             const renderReactWidget = async (widget: any, props: any) => {
-              const safeRender = async () => {
+              const safeRender = async (retryCount = 0, maxRetries = 20) => {
+                // scriptUrl доступен из замыкания registerFunction
                 try {
                   let container = widget.contentRef || widget.container;
 
                   if (!container) {
                     console.warn('❌ Container not found, retrying...');
-                    setTimeout(safeRender, 100);
+                    if (retryCount < maxRetries) {
+                      setTimeout(() => safeRender(retryCount + 1, maxRetries), 100);
+                    }
                     return;
                   }
 
                   if (!document.body.contains(container)) {
                     console.warn('❌ Container not in DOM');
                     return;
+                  }
+
+                  // Проверяем наличие EdickExtWidgets
+                  let EdickExtWidgets = (window as any).EdickExtWidgets;
+                  
+                  if (!EdickExtWidgets) {
+                    // Пытаемся загрузить скрипт динамически, если он не загружен
+                    if (retryCount === 0) {
+                      console.warn('❌ EdickExtWidgets not found, attempting to load script...');
+                      const scriptId = 'edick-ext-widgets-script';
+                      const existingScript = document.getElementById(scriptId);
+                      if (!existingScript) {
+                        const script = document.createElement('script');
+                        script.id = scriptId;
+                        script.src = scriptUrl;
+                        script.async = false; // Загружаем синхронно для гарантии
+                        
+                        // Ждем загрузки скрипта
+                        await new Promise<void>((resolve, reject) => {
+                          script.onload = () => {
+                            console.log('✅ widgets.iife.js loaded successfully');
+                            resolve();
+                          };
+                          script.onerror = () => {
+                            console.error('❌ Failed to load widgets.iife.js');
+                            reject(new Error('Failed to load widgets.iife.js'));
+                          };
+                          document.head.appendChild(script);
+                        });
+                        
+                        // Дополнительная задержка для инициализации
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                      } else {
+                        // Скрипт уже существует, но EdickExtWidgets все еще не доступен
+                        // Возможно, скрипт еще загружается
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                      }
+                    }
+                    
+                    EdickExtWidgets = (window as any).EdickExtWidgets;
+                    
+                    if (!EdickExtWidgets) {
+                      console.warn(`❌ EdickExtWidgets not loaded yet, retrying... (${retryCount}/${maxRetries})`);
+                      if (retryCount < maxRetries) {
+                        setTimeout(() => safeRender(retryCount + 1, maxRetries), 100);
+                        return;
+                      } else {
+                        throw new Error('EdickExtWidgets не загружен после максимального количества попыток. Убедитесь, что widgets.iife.js доступен.');
+                      }
+                    }
+                  }
+
+                  // Проверяем наличие метода renderWidget
+                  if (typeof EdickExtWidgets.renderWidget !== 'function') {
+                    console.warn(`❌ EdickExtWidgets.renderWidget не является функцией, retrying... (${retryCount}/${maxRetries})`);
+                    if (retryCount < maxRetries) {
+                      setTimeout(() => safeRender(retryCount + 1, maxRetries), 100);
+                      return;
+                    } else {
+                      throw new Error('EdickExtWidgets.renderWidget недоступен');
+                    }
                   }
 
                   while (container.firstChild) {
@@ -101,8 +180,6 @@ export class RegistrationService {
                   const reactRoot = document.createElement('div');
                   reactRoot.style.cssText = 'height: 100%; width: 100%;';
                   container.appendChild(reactRoot);
-
-                  const { EdickExtWidgets } = window as any;
 
                   // Используем универсальный рендерер
                   EdickExtWidgets.renderWidget(
@@ -274,7 +351,7 @@ export class RegistrationService {
     const results = await chrome.scripting.executeScript({
       target: { tabId },
       func: registerFunction,
-      args: [widgetsCssUrl, extensionId], // Передаем URL CSS и Extension ID
+      args: [widgetsCssUrl, extensionId, widgetsScriptUrl], // Передаем URL CSS, Extension ID и URL скрипта
       world: 'MAIN'
     });
 
