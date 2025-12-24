@@ -1,6 +1,7 @@
 import type { NewsItem } from '@/utils/api/newsApi/NewsApi';
-import { NewsCard } from './NewsCard';
+
 import styles from '../NewsWidget.module.css';
+import { NewsCard } from './NewsCard';
 
 interface NewsListProps {
   news: NewsItem[];
@@ -16,7 +17,14 @@ export const NewsList = ({
   onTickerClick,
 }: NewsListProps) => {
   if (news.length === 0) {
-    return null;
+    if (isLoadingMore) {
+      return null;
+    }
+    return (
+      <div className={styles.empty}>
+        Пока нет новостей
+      </div>
+    );
   }
 
   return (
