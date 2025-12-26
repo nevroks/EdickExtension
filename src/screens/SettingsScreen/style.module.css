@@ -1,17 +1,28 @@
 .SettingsScreen {
-    display: flex;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .SettingsScreen-content {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    row-gap: 6px;
-
+  row-gap: 6px;
+  flex: 1;
 }
-.lock-container{
-    display: flex;
-    align-items: center;
-    column-gap: 4px
+
+.SettingsScreen-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 4px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.lock-container {
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
 }

@@ -1,15 +1,20 @@
-import { UserAppSettingsManager } from "@/extensionUtils/userAppSettings-manager";
-import type { TabInfo } from "../extensionUtils/extensionTypes";
-import { isTerminalUrl, logInfo } from "../extensionUtils/helpers";
-import { JwtManager } from "../extensionUtils/jwt-manager";
-import { ReactChecker } from "../extensionUtils/react-checker";
-import { RegistrationService } from "../extensionUtils/registration-service";
-import { TabManager } from "../extensionUtils/tab-manager";
-import { TerminalChecker } from "../extensionUtils/terminal-checker";
-import { WebSocketManager } from "../extensionUtils/websocket-manager";
-import { WidgetsChecker } from "../extensionUtils/widgets-checker";
+import { UserAppSettingsManager } from '@/extensionUtils/userAppSettings-manager';
+
+import type { TabInfo } from '../extensionUtils/extensionTypes';
+import {
+  isTerminalUrl,
+  logInfo,
+} from '../extensionUtils/helpers';
+import { JwtManager } from '../extensionUtils/jwt-manager';
+import { ReactChecker } from '../extensionUtils/react-checker';
+import { RegistrationService } from '../extensionUtils/registration-service';
+import { TabManager } from '../extensionUtils/tab-manager';
+import { TerminalChecker } from '../extensionUtils/terminal-checker';
+import { WebSocketManager } from '../extensionUtils/websocket-manager';
+import { WidgetsChecker } from '../extensionUtils/widgets-checker';
 
 console.log('EdickExt: Background script loaded');
+
 
 
 const jwtManager = new JwtManager();
@@ -18,7 +23,7 @@ const userAppSettingsManager = new UserAppSettingsManager();
 const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
-const registrationService = new RegistrationService(tabManager);
+const registrationService = new RegistrationService(tabManager, userAppSettingsManager);
 const websocketManager = new WebSocketManager(jwtManager, tabManager);
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -63,6 +68,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       sendResponse({ accessToken: tokens?.accessToken || null });
       return true; // Указываем, что ответ будет асинхронным
     }
+    
 
     case 'REFRESH_TOKENS': {
       jwtManager.refreshTokens().then((success) => {

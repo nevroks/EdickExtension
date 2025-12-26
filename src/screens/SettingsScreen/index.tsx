@@ -1,92 +1,87 @@
-import { Toggle } from "@/ui";
-import type { UserAppSettings } from "@/utils/types";
-import { useState } from "react";
-import styles from "./style.module.css"
-import lockIcon from "./../../assets/icons/lockIcon.svg"
-import { useChromeStorage } from "@/utils/hooks/useChromeStorage";
-import { defaultUserAppSettings } from "@/utils/consts/appConsts";
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { Button, Toggle } from '@/ui';
+import { defaultUserAppSettings, WIDGET_SETTINGS_KEYS, WIDGETS_CONFIG } from '@/utils/consts/appConsts';
+import { useChromeStorage } from '@/utils/hooks/useChromeStorage';
+import type { UserAppSettings } from '@/utils/types';
+
+import lockIcon from '../../assets/icons/lockIcon.svg';
+import styles from './style.module.css';
 
 const SettingsScreen = () => {
+  const [savedUserAppSettings, setSavedUserAppSettings] = useChromeStorage<UserAppSettings>('userAppSettings', defaultUserAppSettings);
 
-    const [userAppSettings, setUserAppSettings] = useChromeStorage<UserAppSettings>(
-        "userAppSettings", defaultUserAppSettings
-    )
+  const [userAppSettings, setUserAppSettings] = useState<UserAppSettings>(() => savedUserAppSettings);
+  const isSavingRef = useRef(false);
 
-    return (
-        <div className={styles["SettingsScreen"]}>
-            <div className={styles["SettingsScreen-content"]}>
-                <Toggle onChange={(value) => setUserAppSettings({ ...userAppSettings, newsWidget: value })} checked={userAppSettings.newsWidget} >
-                    <Toggle.Switch />
-                    <Toggle.Label text="Новости виджет" />
-                </Toggle>
-                <Toggle onChange={(value) => setUserAppSettings({ ...userAppSettings, robotsWidget: value })} checked={userAppSettings.robotsWidget} >
-                    <Toggle.Switch />
-                    <Toggle.Label text="Роботы виджет" />
-                </Toggle>
-                <Toggle onChange={(value) => setUserAppSettings({ ...userAppSettings, pastuhWidget: value })} checked={userAppSettings.pastuhWidget}>
-                    <Toggle.Switch />
-                    <Toggle.Label text="Пастухи виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+  useEffect(() => {
+    if (isSavingRef.current) {
+      isSavingRef.current = false;
+      return;
+    }
 
-                    <Toggle.Label text="RSI виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+    setUserAppSettings(savedUserAppSettings);
+  }, [savedUserAppSettings]);
 
-                    <Toggle.Label text="Маруся блять какая-то" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+  // Проверяем изменения при обновлении настроек
+  const hasChanges = useMemo(() => {
+    return WIDGET_SETTINGS_KEYS.some((key) => userAppSettings[key] !== savedUserAppSettings[key]);
+  }, [userAppSettings, savedUserAppSettings]);
 
-                    <Toggle.Label text="Ема виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+  const handleSave = async () => {
+    if (hasChanges) {
+      isSavingRef.current = true;
 
-                    <Toggle.Label text="Резкие изменения виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+      setSavedUserAppSettings(userAppSettings);
 
-                    <Toggle.Label text="Крупные лимитки виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+      try {
+        const tabs = await chrome.tabs.query({});
+        const terminalTab = tabs.find((tab) => tab.url && (tab.url.includes('tinkoff.ru/terminal') || tab.url.includes('tbank.ru/terminal')));
 
-                    <Toggle.Label text="Тепловые карты виджет" />
-                </Toggle>
-                <Toggle disabled checked={false} >
-                    <div className={styles["lock-container"]}>
-                        <img src={lockIcon} alt="lockIcon" className={styles["lock-icon"]} />
-                        <Toggle.Switch />
-                    </div>
+        if (terminalTab?.id) {
+          await chrome.tabs.reload(terminalTab.id);
+        }
+      } catch (error) {
+        console.error('Failed to reload terminal tab:', error);
+      }
+    }
+  };
 
-                    <Toggle.Label text="Открытые позиции виджет" />
-                </Toggle>
+  return (
+    <div className={styles['SettingsScreen']}>
+      <div className={styles['SettingsScreen-content']}>
+        {Object.entries(WIDGETS_CONFIG).map(([key, config]) => {
+          const isDisabled = config.disabled === true;
 
-            </div>
-        </div>
-    );
-}
+          if (isDisabled) {
+            return (
+              <Toggle key={key} disabled checked={false}>
+                <div className={styles['lock-container']}>
+                  <img src={lockIcon} alt="lockIcon" className={styles['lock-icon']} />
+                  <Toggle.Switch />
+                </div>
+                <Toggle.Label text={config.label} />
+              </Toggle>
+            );
+          }
+
+          // Активный виджет - должен быть в UserAppSettings
+          const settingKey = key as keyof UserAppSettings;
+          return (
+            <Toggle key={key} onChange={(value) => setUserAppSettings({ ...userAppSettings, [settingKey]: value })} checked={userAppSettings[settingKey]}>
+              <Toggle.Switch />
+              <Toggle.Label text={config.label} />
+            </Toggle>
+          );
+        })}
+      </div>
+      <div className={styles['SettingsScreen-footer']}>
+        <Button onClick={handleSave} disabled={!hasChanges} variant="default">
+          <Button.Text text="Сохранить" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export default SettingsScreen;
