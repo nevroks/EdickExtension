@@ -70,12 +70,12 @@
 
 .title {
   margin: 0;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
 }
 
 .refreshing {
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.8;
 }
 

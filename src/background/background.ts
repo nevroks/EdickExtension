@@ -1,15 +1,18 @@
-import { UserAppSettingsManager } from "@/extensionUtils/userAppSettings-manager";
-import type { TabInfo } from "../extensionUtils/extensionTypes";
-import { isTerminalUrl, logInfo } from "../extensionUtils/helpers";
-import { JwtManager } from "../extensionUtils/jwt-manager";
-import { ReactChecker } from "../extensionUtils/react-checker";
-import { RegistrationService } from "../extensionUtils/registration-service";
-import { TabManager } from "../extensionUtils/tab-manager";
-import { TerminalChecker } from "../extensionUtils/terminal-checker";
-import { WebSocketManager } from "../extensionUtils/websocket-manager";
-import { WidgetsChecker } from "../extensionUtils/widgets-checker";
-import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
+import { UserAppSettingsManager } from '@/extensionUtils/userAppSettings-manager';
 
+import type { TabInfo } from '../extensionUtils/extensionTypes';
+import {
+  isTerminalUrl,
+  logInfo,
+} from '../extensionUtils/helpers';
+import { JwtManager } from '../extensionUtils/jwt-manager';
+import { ReactChecker } from '../extensionUtils/react-checker';
+import { RegistrationService } from '../extensionUtils/registration-service';
+import { TabManager } from '../extensionUtils/tab-manager';
+import { TerminalChecker } from '../extensionUtils/terminal-checker';
+import { WebSocketManager } from '../extensionUtils/websocket-manager';
+import { WidgetsChecker } from '../extensionUtils/widgets-checker';
+import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
 
 console.log('EdickExt: Background script loaded');
 
@@ -20,7 +23,7 @@ const userAppSettingsManager = new UserAppSettingsManager();
 const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
-const registrationService = new RegistrationService(tabManager);
+const registrationService = new RegistrationService(tabManager, userAppSettingsManager);
 const websocketManager = new WebSocketManager(jwtManager, tabManager);
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -71,11 +74,11 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
           // Получаем значение по ключу
           const result = await chrome.storage.local.get([CHROME_STORAGE_KEYS["T-key"]]);
           console.log('🔍 Background: Storage result:', result);
-          
+
           // Извлекаем строку токена
           const tKey = result["T-key"];
           console.log('🔑 Background: T-key value:', tKey, 'Type:', typeof tKey);
-          
+
           // Отправляем строку токена, а не объект
           sendResponse({ tKey: tKey || null });
         } catch (error) {
