@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
+import styles from './style.module.css';
+import classNames from 'classnames';
 
 type CounterInputProps = {
     startValue: number
@@ -6,11 +8,13 @@ type CounterInputProps = {
     maxValue: number
     stepBy: number,
     value?: number
-    onChange: (value: number) => void
+    onChange?: (value: number) => void
     placeholder?: string
+    additionalInputElement?: ReactNode
+    isInputDisabled?: boolean
 }
 
-const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange, placeholder }: CounterInputProps) => {
+const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange, placeholder, additionalInputElement, isInputDisabled = false }: CounterInputProps) => {
 
 
     const [localValue, setLocalValue] = useState(() => {
@@ -42,13 +46,13 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             if (value === undefined) {
                 setLocalValue(finalValue);
             }
-            onChange(finalValue);
+            onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
                 setLocalValue(newValue);
             }
-            onChange(newValue);
+            onChange && onChange(newValue);
         }
     }
 
@@ -67,18 +71,20 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             if (value === undefined) {
                 setLocalValue(finalValue);
             }
-            onChange(finalValue);
+            onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
                 setLocalValue(newValue);
             }
-            onChange(newValue);
+            onChange && onChange(newValue);
         }
     }
 
     // Обработчик прямого ввода в инпут
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (isInputDisabled) return;
+        
         const inputValue = e.target.value;
 
         // Проверяем, является ли ввод числом
@@ -94,7 +100,7 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             if (value === undefined) {
                 setLocalValue(finalValue);
             }
-            onChange(finalValue);
+            onChange && onChange(finalValue);
         }
     }
 
@@ -106,9 +112,12 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
     const displayValue = stepBy % 1 === 0 ? Math.round(currentValue) : currentValue;
 
     return (
-        <div>
-            <div>
+        <div className={styles['CounterInput']}>
+            <div className={classNames(styles['CounterInput-input'], {
+                [styles['CounterInput-input-disabled']]: isInputDisabled
+            })}>
                 <input
+                    className={styles['CounterInput-input-value']}
                     placeholder={placeholder}
                     type="text"
                     value={displayValue}
@@ -116,13 +125,18 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
                     min={minValue}
                     max={maxValue}
                 />
-                <div>
+                {additionalInputElement && <div className={styles['CounterInput-input-additional']}>
+                    {additionalInputElement}
+                </div>}
 
-                </div>
             </div>
-            <div>
-                <button>+</button>
-                <button>-</button>
+            <div className={styles['CounterInput-buttons']}>
+                <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-increment'], {
+                    [styles['CounterInput-buttons-button-disabled']]: !canIncrement || isInputDisabled,
+                })} disabled={!canIncrement} onClick={handleIncrement}>+</button>
+                <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-decrement'], {
+                    [styles['CounterInput-buttons-button-disabled']]: !canDecrement || isInputDisabled
+                })} disabled={!canDecrement} onClick={handleDecrement}>-</button>
             </div>
         </div>
     );

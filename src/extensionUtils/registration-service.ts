@@ -231,7 +231,10 @@ export class RegistrationService {
 
             widgetConfigs.forEach(({ id, config }) => {
               const updateWidget = (widget: any) => {
+                console.log(widget);
+
                 renderReactWidget(widget, {
+                  figi: widget.asset.figi,
                   ticker: widget.ticker,
                   group: widget.group,
                   currency: widget.currency,
