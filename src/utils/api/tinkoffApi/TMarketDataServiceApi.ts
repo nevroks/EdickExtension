@@ -3,6 +3,7 @@ import axios from "axios"
 import { TINKOFF_API_URL } from "@/utils/consts/appConsts"
 import type { InstrumentStatusType } from "./TInstrumentsApi"
 import { TinkoffAppGuard } from "../TinkoffAppGuard"
+import { TinkoffExtensionGuard } from "../TinkoffExtensionGuard"
 
 
 
@@ -20,6 +21,20 @@ export type GetLastPricesRequest = {
     lastPriceType?: LastPriceType
     instrumentStatus?: InstrumentStatusType,
 }
+export type GetLastPricesResponse = {
+    lastPrices: {
+        classCode: string,
+        figi: string,
+        instrumentUid: string,
+        lastPriceType: string,
+        price: {
+            nano: number,
+            units: string
+        },
+        ticker: string,
+        time: string
+    }[]
+}
 
 class TMarketDataServiceApi {
     protected api: AxiosInstance;
@@ -35,7 +50,7 @@ class TMarketDataServiceApi {
     }
 
     async getLastPrices(requestBody: GetLastPricesRequest) {
-        const { data } = await this.api.post(`/GetLastPrices`, {
+        const { data } = await this.api.post<GetLastPricesResponse>(`/GetLastPrices`, {
             instrumentId: requestBody.instrumentId,
             lastPriceType: requestBody.lastPriceType || 'LAST_PRICE_UNSPECIFIED',
             instrumentStatus: requestBody.instrumentStatus || 'INSTRUMENT_STATUS_UNSPECIFIED'
@@ -46,6 +61,13 @@ class TMarketDataServiceApi {
 
 @TinkoffAppGuard
 export class TinkoffAppSecuredTMarketDataServiceApi extends TMarketDataServiceApi {
+    constructor() {
+        super(`${TINKOFF_API_URL}/tinkoff.public.invest.api.contract.v1.MarketDataService`);
+    }
+}
+
+@TinkoffExtensionGuard
+export class TinkoffExtensionSecuredTMarketDataServiceApi extends TMarketDataServiceApi {
     constructor() {
         super(`${TINKOFF_API_URL}/tinkoff.public.invest.api.contract.v1.MarketDataService`);
     }

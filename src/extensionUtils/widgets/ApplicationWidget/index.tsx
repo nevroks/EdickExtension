@@ -4,7 +4,9 @@ import classNames from 'classnames';
 import ApplicationWidgetMarketTab from './components/ApplicationWidgetMarketTab';
 import ApplicationWidgetLimitedTab from './components/ApplicationWidgetLimitedTab';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import useTMarketDataServiceApi from '@/utils/hooks/useTMarketDataServiceApi';
+import useTMarketDataServiceApi from '../shared/hooks/useTMarketDataServiceApi';
+
+
 
 
 const queryClient = new QueryClient({
@@ -37,11 +39,6 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi }: Applicatio
     
     const { data: lastPrice } = getLastPrice({ instrumentId: [figi!], })
     
-    
-
-    // НУЖНО ОТРИСОВАТЬ ЧТО ТИПО ЗАЯВКА НЕ ДОСТУПНА ДЛЯ ИНСТРУМЕНТА
-
-    console.log(lastPrice);
 
 
     return (
