@@ -281,6 +281,28 @@ export class RegistrationService {
                     },
                   },
                 },
+                {
+                  id: 'application',
+                  config: {
+                    layout: { width: 400, height: 500 },
+                    settings: {
+                      title: 'Заявки',
+                      searchable: true,
+                      symbolRequired: false,
+                      noGroup: false,
+                      fullscreenAllowed: true,
+                      isSymbolResettingWithGroup: false,
+                      useSymbolInTitle: false,
+                      pinnable: true,
+                    },
+                    menu: {
+                      icon: 'newspaper',
+                      label: 'Заявки EdickExt',
+                      order: 2,
+                      hint: 'Последние заявки',
+                    },
+                  },
+                },
               ];
 
               // Фильтруем виджеты на основе настроек
@@ -288,7 +310,10 @@ export class RegistrationService {
 
               widgetConfigs.forEach(({ id, config }) => {
                 const updateWidget = (widget: any) => {
+                  console.log(widget);
+
                   renderReactWidget(widget, {
+                    figi: widget.asset.figi,
                     ticker: widget.ticker,
                     group: widget.group,
                     currency: widget.currency,

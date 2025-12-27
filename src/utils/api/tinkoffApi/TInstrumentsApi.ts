@@ -1,22 +1,25 @@
 import { TINKOFF_API_URL } from "@/utils/consts/appConsts"
 import type { AxiosInstance } from "axios"
 import axios from "axios"
-import { tinkoffSecuredAxiosApi } from "../tinkoffSecuredAxiosApi"
+import { TinkoffAppGuard } from "../TinkoffAppGuard"
+
 
 
 export type InstrumentStatusType = "INSTRUMENT_STATUS_UNSPECIFIED" | "INSTRUMENT_STATUS_BASE" | "INSTRUMENT_STATUS_ALL"
 export type InstrumentExchangeType = "INSTRUMENT_EXCHANGE_UNSPECIFIED" | "INSTRUMENT_EXCHANGE_DEALER"
 
 
-export class TInstrumentsApi {
-  private api: AxiosInstance
+class TInstrumentsApi {
+  protected api: AxiosInstance;
 
-  constructor() {
-    this.api = tinkoffSecuredAxiosApi({
-      api: axios.create({
-        baseURL: `${TINKOFF_API_URL}/tinkoff.public.invest.api.contract.v1.InstrumentsService`
-      })
-    })
+  constructor(baseURL: string) {
+    this.api = axios.create({
+      baseURL,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      }
+    });
   }
   // Список Облигаций
   async getBonds(instrumentStatus: InstrumentStatusType, instrumentExchange: InstrumentExchangeType) {
@@ -29,5 +32,13 @@ export class TInstrumentsApi {
     } catch (error) {
       throw error
     }
+  }
+}
+
+
+@TinkoffAppGuard
+export class TinkoffAppSecuredTTInstrumentsApi extends TInstrumentsApi {
+  constructor() {
+    super(`${TINKOFF_API_URL}/tinkoff.public.invest.api.contract.v1.InstrumentsService`);
   }
 }

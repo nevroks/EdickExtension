@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
 
-import { TInstrumentsApi, type InstrumentExchangeType, type InstrumentStatusType } from '../api/tinkoffApi/TInstrumentsApi'
+import {  TinkoffAppSecuredTTInstrumentsApi, type InstrumentExchangeType, type InstrumentStatusType } from '../api/tinkoffApi/TInstrumentsApi'
 
 // Создаем экземпляр API
-const instrumentsApi = new TInstrumentsApi()
+const instrumentsApi = new TinkoffAppSecuredTTInstrumentsApi()
 
 export const useTInstrumentsApi = () => {
     // Хук для получения облигаций

@@ -8,7 +8,23 @@ window.addEventListener('message', (event) => {
   if (event.data?.source !== MESSAGE_SOURCE) {
     return;
   }
-
+  // нужно добавить проверку то что эта зула пришла от нашего content script а не от чужого
+  if (event.data.type === 'GET_T_KEY') {
+    chrome.runtime.sendMessage(
+      { type: 'GET_T_KEY' },
+      (response) => {
+        window.postMessage(
+          {
+            source: MESSAGE_TARGET,
+            requestId: event.data.requestId,
+            tKey: response?.tKey || null,
+          },
+          '*'
+        );
+      }
+    );
+  }
+  
   if (event.data.type === 'GET_ACCESS_TOKEN') {
     chrome.runtime.sendMessage(
       { type: 'GET_ACCESS_TOKEN' },

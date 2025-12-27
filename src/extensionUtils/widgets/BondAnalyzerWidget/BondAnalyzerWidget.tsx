@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-interface BondAnalyzerWidgetProps {
+export interface BondAnalyzerWidgetProps {
   ticker?: string;
   // group?: string;
   // currency?: string;

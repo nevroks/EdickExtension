@@ -1,0 +1,78 @@
+.CounterInput {
+    display: flex;
+    align-items: center;
+    column-gap: 3px;
+}
+
+.CounterInput-input {
+    display: flex;
+    align-items: center;
+    border-radius: 6px 0px 0px 6px;
+    background: rgba(44, 62, 77, 1);
+    padding: 0 9px;
+    height: 34px;
+}
+
+.CounterInput-input-disabled {
+    background: rgba(30, 39, 47, 1);
+}
+
+.CounterInput-input-value {
+    display: flex;
+    background: transparent;
+    border: none;
+    color: white;
+}
+
+.CounterInput-input-value::placeholder {
+    color: #2C3E4D;
+}
+
+.CounterInput-input-additional {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    width: 30px;
+}
+
+.CounterInput-buttons {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+}
+
+.CounterInput-buttons-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 16px;
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: rgba(44, 62, 77, 1);
+    color: rgba(98, 131, 159, 1);
+    border: none;
+}
+
+.CounterInput-buttons-button-increment {
+    border-radius: 0px 6px 0px 0px;
+}
+
+.CounterInput-buttons-button-decrement {
+    border-radius: 0px 0px 6px 0px;
+}
+
+.CounterInput-buttons-button:hover {
+    transform: scale(1.05);
+}
+
+.CounterInput-buttons-button:active {
+    bottom: -2px;
+}
+
+.CounterInput-buttons-button-disabled {
+    cursor: not-allowed;
+    background: rgba(30, 39, 47, 1);
+}
