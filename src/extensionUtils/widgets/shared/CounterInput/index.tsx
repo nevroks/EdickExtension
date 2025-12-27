@@ -133,10 +133,10 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             <div className={styles['CounterInput-buttons']}>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-increment'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canIncrement || isInputDisabled,
-                })} disabled={!canIncrement} onClick={handleIncrement}>+</button>
+                })} disabled={!canIncrement || isInputDisabled} onClick={handleIncrement}>+</button>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-decrement'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canDecrement || isInputDisabled
-                })} disabled={!canDecrement} onClick={handleDecrement}>-</button>
+                })} disabled={!canDecrement || isInputDisabled} onClick={handleDecrement}>-</button>
             </div>
         </div>
     );

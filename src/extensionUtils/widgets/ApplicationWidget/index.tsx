@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useTMarketDataServiceApi from '../shared/hooks/useTMarketDataServiceApi';
 import useTInstrumentsApi from '../shared/hooks/useTInstrumentsApi';
 import type { TinkoffPrice } from '@/utils/api/tinkoffApi/TMarketDataServiceApi';
+import useTUsersServiceApi from '../shared/hooks/useTUsersServiceApi';
+import useTOperationsServiceApi from '../shared/hooks/useTOperationsServiceApi';
 
 
 
@@ -45,10 +47,16 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
 
     const { queries: { getLastPrice, getClosePrices } } = useTMarketDataServiceApi()
     const { queries: { getInstrument } } = useTInstrumentsApi()
+    const { queries: { getInfo } } = useTUsersServiceApi()
+    const { queries: { getPortfolio } } = useTOperationsServiceApi()
 
+    const { data: userInfo } = getInfo()
     const { data: lastPrice } = getLastPrice({ instrumentId: [figi!] })
     const { data: instrumentInfo } = getInstrument({ instrumentUid: figi! })
     const { data: closePrices } = getClosePrices({ instrumentId: [figi!] })
+    console.log(userInfo);
+    
+    const { data: portfolio } = getPortfolio({ accountId: userInfo?.userId })
 
 
     const dayPriceDifference = useMemo(() => {
@@ -97,6 +105,14 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
         }
 
     }, [closePrices?.closePrices[0].eveningSessionPrice.nano, closePrices?.closePrices[0].eveningSessionPrice.units, lastPrice?.lastPrices[0].price.nano, lastPrice?.lastPrices[0].price.units])
+    console.log(portfolio);
+    
+    // console.log(portfolio?.positions.forEach(position => {
+    //     if (position.figi === figi) {
+    //         console.log("found:", position);
+    //     }
+    // }));
+
 
     // console.log(lastPrice);
     // console.log(instrumentInfo);
