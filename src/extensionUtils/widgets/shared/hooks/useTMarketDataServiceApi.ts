@@ -1,4 +1,4 @@
-import { TinkoffExtensionSecuredTMarketDataServiceApi, type GetLastPricesRequest } from '@/utils/api/tinkoffApi/TMarketDataServiceApi'
+import { TinkoffExtensionSecuredTMarketDataServiceApi, type GetClosePricesRequest, type GetLastPricesRequest } from '@/utils/api/tinkoffApi/TMarketDataServiceApi'
 import { useQuery } from '@tanstack/react-query'
 
 
@@ -15,7 +15,7 @@ export const useTMarketDataServiceApi = () => {
         return useQuery({
             queryKey: ['tinkoff', 'lastPrice', JSON.stringify([...requestBody.instrumentId]), requestBody.lastPriceType, requestBody.instrumentStatus],
             queryFn: () => marketDataServiceApi.getLastPrices(requestBody),
-            refetchInterval: 5000, // 1 секунда
+            refetchInterval: 2500, // сидел смотрел с какой скоростью работает тинёк, эта скорость оптимальная
             // @ts-ignore
             enabled: Boolean(requestBody.instrumentId) && !requestBody.instrumentId.includes(undefined),
             refetchIntervalInBackground: true, // Продолжать обновлять даже когда вкладка неактивна
@@ -24,9 +24,23 @@ export const useTMarketDataServiceApi = () => {
         })
     }
 
+    const getClosePrices = (
+        requestBody: GetClosePricesRequest
+    ) => {
+        return useQuery({
+            queryKey: ['tinkoff', 'closePrice', JSON.stringify([...requestBody.instrumentId]), requestBody.instrumentStatus],
+            queryFn: () => marketDataServiceApi.getClosePrices(requestBody),
+            staleTime: 10 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
+            // @ts-ignore
+            enabled: Boolean(requestBody.instrumentId) && !requestBody.instrumentId.includes(undefined),
+        })
+    }
+
     return {
         queries: {
-            getLastPrice
+            getLastPrice,
+            getClosePrices
         }
 
     }

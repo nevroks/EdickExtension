@@ -283,6 +283,7 @@ export class RegistrationService {
                 },
                 {
                   id: 'application',
+                  enabled: settings.applicationWidget,
                   config: {
                     layout: { width: 400, height: 500 },
                     settings: {
@@ -313,6 +314,7 @@ export class RegistrationService {
                   console.log(widget);
 
                   renderReactWidget(widget, {
+                    assetUid: widget.asset.assetUid,
                     figi: widget.asset.figi,
                     ticker: widget.ticker,
                     group: widget.group,
@@ -328,6 +330,8 @@ export class RegistrationService {
                     mount: (widget: any) => {
                       console.log(`Widget ${id} mounted:`, widget);
                       renderReactWidget(widget, {
+                        assetUid: widget.asset.assetUid,
+                        figi: widget.asset.figi,
                         ticker: widget.ticker,
                         group: widget.group,
                         currency: widget.currency,

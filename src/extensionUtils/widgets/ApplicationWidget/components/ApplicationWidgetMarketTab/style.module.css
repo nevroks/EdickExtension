@@ -1,0 +1,9 @@
+.ApplicationWidgetMarketTab-ticket-price-difference{
+    cursor: pointer;
+    color: rgb(44, 232, 156);
+    
+    transition: all 0.2s ease;
+}
+.ApplicationWidgetMarketTab-ticket-price-difference.negative{
+    color: rgb(255, 105, 105);
+}
