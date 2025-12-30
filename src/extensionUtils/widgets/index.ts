@@ -10,7 +10,7 @@ type WidgetProps = Record<string, any>;
 type WidgetComponent<P extends WidgetProps = WidgetProps> = (props: P) => React.ReactElement;
 
 // Union тип для идентификаторов виджетов
-export type WidgetId = 'bond-analyzer' | 'news' | 'application';
+export type WidgetId = 'bond-analyzer' | 'news' | 'application' | 'open-positions' | 'heat-maps' | 'large-limits' | 'sharp-changes' | 'ema' | 'marusya' | 'rsi' | 'pastuh' | 'robots';
 
 export type widgetsRegistry = {
     'bond-analyzer': WidgetComponent<BondAnalyzerWidgetProps>,

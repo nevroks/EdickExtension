@@ -1,3 +1,4 @@
+import { injectSessionStorageWatcher } from '../content/session-storage-watcher-injector.js';
 import { defaultUserAppSettings } from '../utils/consts/appConsts.js';
 import type { RegistrationResult, TabInfo } from './extensionTypes.js';
 import { logError, logInfo, logSuccess, showNotification } from './helpers.js';
@@ -47,6 +48,20 @@ export class RegistrationService {
     } catch (error) {
       logError('Failed to inject widgets script:', error);
       // Продолжаем, возможно скрипт уже загружен
+    }
+
+    // Инжектируем SessionStorageWatcher в MAIN world для доступа виджетов
+    try {
+      logInfo('Injecting SessionStorageWatcher to MAIN world...');
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        func: injectSessionStorageWatcher,
+        world: 'MAIN',
+      });
+      logSuccess('SessionStorageWatcher injected successfully');
+    } catch (error) {
+      logError('Failed to inject SessionStorageWatcher:', error);
+      // Продолжаем, возможно watcher уже загружен
     }
 
     const widgetsCssUrl = chrome.runtime.getURL('widgets.css');
@@ -283,6 +298,7 @@ export class RegistrationService {
                 },
                 {
                   id: 'application',
+                  enabled: settings.applicationWidget,
                   config: {
                     layout: { width: 400, height: 500 },
                     settings: {
@@ -313,7 +329,8 @@ export class RegistrationService {
                   console.log(widget);
 
                   renderReactWidget(widget, {
-                    figi: widget.asset.figi,
+                    assetUid: widget.asset?.assetUid,
+                    figi: widget.asset?.figi,
                     ticker: widget.ticker,
                     group: widget.group,
                     currency: widget.currency,
@@ -328,6 +345,8 @@ export class RegistrationService {
                     mount: (widget: any) => {
                       console.log(`Widget ${id} mounted:`, widget);
                       renderReactWidget(widget, {
+                        assetUid: widget.asset?.assetUid,
+                        figi: widget.asset?.figi,
                         ticker: widget.ticker,
                         group: widget.group,
                         currency: widget.currency,

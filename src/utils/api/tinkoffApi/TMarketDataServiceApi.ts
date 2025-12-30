@@ -21,21 +21,54 @@ export type GetLastPricesRequest = {
     lastPriceType?: LastPriceType
     instrumentStatus?: InstrumentStatusType,
 }
+export type TinkoffPrice = {
+    nano: number,
+    units: string
+}
 export type GetLastPricesResponse = {
     lastPrices: {
         classCode: string,
         figi: string,
         instrumentUid: string,
         lastPriceType: string,
-        price: {
-            nano: number,
-            units: string
-        },
+        price: TinkoffPrice,
         ticker: string,
         time: string
     }[]
 }
 
+export type GetClosePricesRequest = {
+    instrumentId: InstrumentIdType[],
+    instrumentStatus?: InstrumentStatusType
+}
+type GetClosePricesResponse = {
+    closePrices: {
+        classCode
+        :
+        string
+        eveningSessionPrice
+        :
+        TinkoffPrice
+        eveningSessionPriceTime
+        :
+        string
+        figi
+        :
+        string
+        instrumentUid
+        :
+        string
+        price
+        :
+        TinkoffPrice
+        ticker
+        :
+        string
+        time
+        :
+        string
+    }[]
+}
 class TMarketDataServiceApi {
     protected api: AxiosInstance;
 
@@ -53,6 +86,13 @@ class TMarketDataServiceApi {
         const { data } = await this.api.post<GetLastPricesResponse>(`/GetLastPrices`, {
             instrumentId: requestBody.instrumentId,
             lastPriceType: requestBody.lastPriceType || 'LAST_PRICE_UNSPECIFIED',
+            instrumentStatus: requestBody.instrumentStatus || 'INSTRUMENT_STATUS_UNSPECIFIED'
+        });
+        return data;
+    }
+    async getClosePrices(requestBody: GetClosePricesRequest) {
+        const { data } = await this.api.post<GetClosePricesResponse>(`/GetClosePrices`, {
+            instruments: requestBody.instrumentId.map((id) => ({ instrumentId: id })),
             instrumentStatus: requestBody.instrumentStatus || 'INSTRUMENT_STATUS_UNSPECIFIED'
         });
         return data;

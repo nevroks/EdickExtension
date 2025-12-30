@@ -13,6 +13,7 @@ import { TerminalChecker } from '../extensionUtils/terminal-checker';
 import { WebSocketManager } from '../extensionUtils/websocket-manager';
 import { WidgetsChecker } from '../extensionUtils/widgets-checker';
 import { CHROME_STORAGE_KEYS } from "@/utils/consts/appConsts";
+import { SessionStorageManager } from '@/extensionUtils/session-storage-manager';
 
 console.log('EdickExt: Background script loaded');
 
@@ -24,6 +25,7 @@ const terminalChecker = new TerminalChecker(tabManager);
 const reactChecker = new ReactChecker(tabManager);
 const widgetsChecker = new WidgetsChecker(tabManager);
 const registrationService = new RegistrationService(tabManager, userAppSettingsManager);
+const sessionStorageManager = new SessionStorageManager(tabManager);
 const websocketManager = new WebSocketManager(jwtManager, tabManager);
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -57,6 +59,8 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.
 
     logInfo(`Terminal API available for tab ${tabId}, proceeding with registration`);
     await registrationService.registerExtension(tab as TabInfo);
+
+ 
   }
 });
 
@@ -67,6 +71,24 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       const tokens = jwtManager.getTokens();
       sendResponse({ accessToken: tokens?.accessToken || null });
       return true; // Указываем, что ответ будет асинхронным
+    }
+    case 'SESSION_WATCHER_READY': {
+      if (_sender.tab?.id) {
+        const tabId = _sender.tab.id;
+        sessionStorageManager.updateTabData(tabId, request.payload.values);
+        logInfo(`SessionStorageWatcher ready for tab ${tabId}`, request.payload);
+      }
+      break;
+    }
+
+    case 'SESSION_STORAGE_CHANGE': {
+      if (_sender.tab?.id) {
+        const tabId = _sender.tab.id;
+        const { key, oldValue, newValue, allValues } = request.payload;
+        sessionStorageManager.updateTabData(tabId, allValues);
+        logInfo(`SessionStorage change on tab ${tabId}:`, { key, oldValue, newValue });
+      }
+      break;
     }
     case 'GET_T_KEY': {
       async function getTKey() {

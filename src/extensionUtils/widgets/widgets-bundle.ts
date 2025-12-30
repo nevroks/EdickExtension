@@ -1,10 +1,10 @@
 // Главный файл бандла виджетов
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BondAnalyzerWidget } from './BondAnalyzerWidget/BondAnalyzerWidget';
-import { NewsWidget } from './NewsWidget/NewsWidget';
-import { WIDGET_REGISTRY, type widgetsRegistry } from '.';
-import ApplicationWidget from './ApplicationWidget';
+
+
+import { WIDGET_REGISTRY  } from '.';
+
 
 // Импорты остальных виджетов...
 

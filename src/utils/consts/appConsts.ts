@@ -1,3 +1,4 @@
+import type { WidgetId } from '@/extensionUtils/widgets';
 import type { UserAppSettings } from '../types';
 
 export const TINKOFF_API_URL = 'https://invest-public-api.tinkoff.ru/rest';
@@ -12,7 +13,7 @@ export const CHROME_STORAGE_KEYS = {
 
 // Тип конфигурации виджета
 export type WidgetConfigItem = {
-  widgetId: string;
+  widgetId: WidgetId;
   label: string;
   defaultValue?: boolean;
   disabled?: boolean;
@@ -25,6 +26,11 @@ export const WIDGETS_CONFIG: Record<string, WidgetConfigItem> = {
   newsWidget: {
     widgetId: 'news',
     label: 'Новости виджет',
+    defaultValue: true,
+  },
+  applicationWidget: {
+    widgetId: 'application',
+    label: 'Заявки виджет',
     defaultValue: true,
   },
   robotsWidget: {

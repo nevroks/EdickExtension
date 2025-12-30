@@ -74,6 +74,27 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
   }
 });
 
+// Слушаем сообщения от SessionStorageWatcher в MAIN world и пересылаем в background
+window.addEventListener('message', (event) => {
+  if (event.data?.source === 'EDICK_EXT_SESSION_STORAGE_WATCHER') {
+    if (event.data.type === 'SESSION_STORAGE_CHANGE') {
+      chrome.runtime.sendMessage({
+        type: 'SESSION_STORAGE_CHANGE',
+        payload: {
+          ...event.data.payload,
+          url: window.location.href,
+          timestamp: Date.now(),
+        },
+      });
+    } else if (event.data.type === 'SESSION_WATCHER_READY') {
+      chrome.runtime.sendMessage({
+        type: 'SESSION_WATCHER_READY',
+        payload: event.data.payload,
+      });
+    }
+  }
+});
+
 // Функция для проверки загрузки виджетов
 const checkWidgetsLoaded = () => {
   if ((window as any).EdickExtWidgets) {
