@@ -3,6 +3,8 @@
  * Должна быть отдельной функцией для сериализации через chrome.scripting.executeScript
  */
 
+export type watchedKeys = 'nonShared' | 'другой ключ';
+
 export function injectSessionStorageWatcher() {
   'use strict';
 
@@ -24,7 +26,7 @@ export function injectSessionStorageWatcher() {
   }
 
   class SessionStorageWatcher {
-    private watchedKeys: string[] = ['nonShared'];
+    private watchedKeys: watchedKeys[] = ['nonShared'];
     private values: Map<string, string | null> = new Map();
     private isActive = false;
     private handlers: Set<(change: { key: string; oldValue: string | null; newValue: string | null; type: string }) => void> = new Set();
@@ -47,7 +49,7 @@ export function injectSessionStorageWatcher() {
       const originalRemoveItem = sessionStorage.removeItem.bind(sessionStorage);
       const originalClear = sessionStorage.clear.bind(sessionStorage);
 
-      sessionStorage.setItem = (key: string, value: string): void => {
+      sessionStorage.setItem = (key: watchedKeys, value: string): void => {
         try {
           const oldValue = sessionStorage.getItem(key);
           originalSetItem(key, value);
@@ -61,7 +63,7 @@ export function injectSessionStorageWatcher() {
         }
       };
 
-      sessionStorage.removeItem = (key: string): void => {
+      sessionStorage.removeItem = (key: watchedKeys): void => {
         try {
           const oldValue = sessionStorage.getItem(key);
           originalRemoveItem(key);
@@ -97,7 +99,7 @@ export function injectSessionStorageWatcher() {
       };
     }
 
-    private handleChange(change: { key: string; oldValue: string | null; newValue: string | null; type: string }): void {
+    private handleChange(change: { key: watchedKeys; oldValue: string | null; newValue: string | null; type: string }): void {
       const { key } = change;
       if (!this.watchedKeys.includes(key)) {
         return;
@@ -158,7 +160,7 @@ export function injectSessionStorageWatcher() {
       return Object.fromEntries(this.values);
     }
 
-    public watchKey(key: string): void {
+    public watchKey(key: watchedKeys): void {
       if (!this.watchedKeys.includes(key)) {
         this.watchedKeys.push(key);
         const value = sessionStorage.getItem(key);

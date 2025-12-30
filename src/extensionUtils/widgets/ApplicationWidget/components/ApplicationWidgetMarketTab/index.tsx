@@ -22,6 +22,8 @@ const ApplicationWidgetMarketTab = ({ price, instrumentInfo, dayPriceDifference 
     const convertedPrice = convertPriceFromNano(price || { units: "0", nano: 0 });
     const [showDifferenceIn, setShowDifferenceIn] = useState<"percentage" | "currency">("currency")
 
+    const [inputValue, setInputValue] = useState(1);
+    
     const isPriceDifferenceNegative = dayPriceDifference.absoluteDifference[0] === "-";
 
     return (
@@ -62,13 +64,17 @@ const ApplicationWidgetMarketTab = ({ price, instrumentInfo, dayPriceDifference 
                 <div className={styles['ApplicationWidgetMarketTab-actions-inputs']}>
                     <div className={styles['ApplicationWidgetMarketTab-actions-inputs-item']}>
                         <p>Цена исполнения</p>
-                        <CounterInput isInputDisabled={true} additionalInputElement={<span>Rub</span>} startValue={1} minValue={1} maxValue={1000000} stepBy={100} />
+                        <CounterInput placeholder='Рыночная' isInputDisabled={true} additionalInputElement={<span>Rub</span>} startValue={1} minValue={1} maxValue={1000000} stepBy={100} />
                     </div>
                     <div className={styles['ApplicationWidgetMarketTab-actions-inputs-item']}>
                         <p>Количество</p>
-                        <CounterInput additionalInputElement={<span>x1</span>} startValue={1} minValue={1} maxValue={5000} stepBy={1} />
+                        <CounterInput additionalInputElement={<span>x1</span>} onChange={value=>{setInputValue(value)}} startValue={1} minValue={1} maxValue={5000} stepBy={1} />
                     </div>
-
+                    
+                </div>
+                <div>
+                    <p>Примерная стоимость</p>
+                    {/* {convertedPrice * inputValue} */}
                 </div>
 
             </div>

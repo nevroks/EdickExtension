@@ -9,6 +9,7 @@ import useTInstrumentsApi from '../shared/hooks/useTInstrumentsApi';
 import type { TinkoffPrice } from '@/utils/api/tinkoffApi/TMarketDataServiceApi';
 import useTUsersServiceApi from '../shared/hooks/useTUsersServiceApi';
 import useTOperationsServiceApi from '../shared/hooks/useTOperationsServiceApi';
+import { useSessionStorageWatcher } from '../shared/hooks/useSessionStorageWatcher';
 
 
 
@@ -38,6 +39,21 @@ type ApplicationWidgetMode = "market" | "limited" | "iceberg" | "delayed"
 
 const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: ApplicationWidgetProps) => {
 
+
+    const { parsedValue, _unparsedValue } = useSessionStorageWatcher<{
+        accountId: string
+        activeSpaceId: string
+        activeSpaceStatus: string
+        balanceSettings:{
+            currency: string
+            isDaily: boolean
+        }
+        strategyId: string
+        ui:{
+            isAddSpaceDialogShown: boolean
+        }
+    }>('nonShared');
+
     const [ApplicationWidgetMode, setApplicationWidgetMode] = useState<ApplicationWidgetMode>("market")
 
     // console.log(figi);
@@ -47,16 +63,15 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
 
     const { queries: { getLastPrice, getClosePrices } } = useTMarketDataServiceApi()
     const { queries: { getInstrument } } = useTInstrumentsApi()
-    const { queries: { getInfo } } = useTUsersServiceApi()
     const { queries: { getPortfolio } } = useTOperationsServiceApi()
 
-    const { data: userInfo } = getInfo()
+    
     const { data: lastPrice } = getLastPrice({ instrumentId: [figi!] })
     const { data: instrumentInfo } = getInstrument({ instrumentUid: figi! })
     const { data: closePrices } = getClosePrices({ instrumentId: [figi!] })
-    console.log(userInfo);
+    console.log("parsed:",parsedValue);
     
-    const { data: portfolio } = getPortfolio({ accountId: userInfo?.userId })
+    const { data: portfolio } = getPortfolio({ accountId: parsedValue?.accountId! })
 
 
     const dayPriceDifference = useMemo(() => {
@@ -106,7 +121,7 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
 
     }, [closePrices?.closePrices[0].eveningSessionPrice.nano, closePrices?.closePrices[0].eveningSessionPrice.units, lastPrice?.lastPrices[0].price.nano, lastPrice?.lastPrices[0].price.units])
     console.log(portfolio);
-    
+
     // console.log(portfolio?.positions.forEach(position => {
     //     if (position.figi === figi) {
     //         console.log("found:", position);
