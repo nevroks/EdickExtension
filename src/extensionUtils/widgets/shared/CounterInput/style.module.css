@@ -1,11 +1,16 @@
 .CounterInput {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
     column-gap: 3px;
+    width: 100%;
+    min-width: 177px;
 }
 
+
 .CounterInput-input {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 30px;
     align-items: center;
     border-radius: 6px 0px 0px 6px;
     background: rgba(44, 62, 77, 1);
@@ -38,6 +43,7 @@
 
 .CounterInput-buttons {
     display: flex;
+    grid-column: 2;
     flex-direction: column;
     row-gap: 2px;
 }

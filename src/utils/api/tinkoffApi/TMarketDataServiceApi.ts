@@ -43,31 +43,38 @@ export type GetClosePricesRequest = {
 }
 type GetClosePricesResponse = {
     closePrices: {
-        classCode
-        :
-        string
-        eveningSessionPrice
-        :
-        TinkoffPrice
-        eveningSessionPriceTime
-        :
-        string
-        figi
-        :
-        string
-        instrumentUid
-        :
-        string
-        price
-        :
-        TinkoffPrice
-        ticker
-        :
-        string
-        time
-        :
-        string
+        classCode: string
+        eveningSessionPrice: TinkoffPrice
+        eveningSessionPriceTime: string
+        figi: string
+        instrumentUid: string
+        price: TinkoffPrice
+        ticker: string
+        time: string
     }[]
+}
+
+export type GetOrderBookRequest = {
+    depth?: number,
+    instrumentId: InstrumentIdType,
+}
+
+type GetOrderBookResponse = {
+    figi: string
+    depth: number
+    bids: {
+        price: TinkoffPrice
+        quantity: string
+    }[]
+    asks: {
+        price: TinkoffPrice
+        quantity: string
+    }[]
+    lastPrice: TinkoffPrice,
+    limitUp: TinkoffPrice,
+    limitDown: TinkoffPrice
+    instrumentUid: string
+    // ещё пару полей не описал, нах надо впринцепе
 }
 class TMarketDataServiceApi {
     protected api: AxiosInstance;
@@ -82,6 +89,7 @@ class TMarketDataServiceApi {
         });
     }
 
+    // нет смысла использовать, getOrderBook имеет те же данные + свои
     async getLastPrices(requestBody: GetLastPricesRequest) {
         const { data } = await this.api.post<GetLastPricesResponse>(`/GetLastPrices`, {
             instrumentId: requestBody.instrumentId,
@@ -94,6 +102,13 @@ class TMarketDataServiceApi {
         const { data } = await this.api.post<GetClosePricesResponse>(`/GetClosePrices`, {
             instruments: requestBody.instrumentId.map((id) => ({ instrumentId: id })),
             instrumentStatus: requestBody.instrumentStatus || 'INSTRUMENT_STATUS_UNSPECIFIED'
+        });
+        return data;
+    }
+    async getOrderBook(requestBody: GetOrderBookRequest) {
+        const { data } = await this.api.post<GetOrderBookResponse>(`/GetOrderBook`, {
+            instrumentId: requestBody.instrumentId,
+            depth: requestBody.depth || 1
         });
         return data;
     }
