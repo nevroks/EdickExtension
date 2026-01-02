@@ -26,7 +26,7 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
     // Используем дебаунс для строки ввода
     const [debouncedInputString, setDebouncedInputString, unDebouncedInputString, setUnDebouncedInputString] = useBetterDebounce<string>(
         currentValue.toString(),
-        1000
+        900
     );
 
     useEffect(() => {
