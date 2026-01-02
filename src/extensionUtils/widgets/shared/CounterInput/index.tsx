@@ -22,20 +22,11 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
         const initialValue = startValue < minValue ? minValue : startValue > maxValue ? maxValue : startValue
         return initialValue
     });
-    const currentValue = value !== undefined ? value : localValue;
     // Используем дебаунс для строки ввода
     const [debouncedInputString, setDebouncedInputString, unDebouncedInputString, setUnDebouncedInputString] = useBetterDebounce<string>(
-        currentValue.toString(),
+        localValue.toString(),
         900
     );
-
-    useEffect(() => {
-        if (value !== undefined) {
-            const stringValue = value.toString();
-            setUnDebouncedInputString(stringValue);
-            setDebouncedInputString(stringValue);
-        }
-    }, [value]);
 
     // Обработка дебаунсированного значения
     useEffect(() => {
@@ -50,48 +41,36 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             return;
         }
 
-        // Проверяем формат в зависимости от allowDecimal
-
-        let parsedValue = 0;
+        let parsedValue: number | null = null;
+        let isValid = false;
 
         if (allowDecimal) {
             // Для дробных чисел проверяем
             const decimalRegex = /^\d+(\.\d{0,2})?$/;
-            if (decimalRegex.test(debouncedInputString) && debouncedInputString !== '.') {
+            if (decimalRegex.test(debouncedInputString)) {
                 parsedValue = parseFloat(debouncedInputString);
-
+                isValid = !isNaN(parsedValue);
             }
         } else {
             // Для целых чисел проверяем
             if (/^\d+$/.test(debouncedInputString)) {
-                parsedValue = parseInt(debouncedInputString);
-
+                parsedValue = parseInt(debouncedInputString, 10);
+                isValid = !isNaN(parsedValue);
             }
         }
 
 
-
         // Проверяем границы
-        let finalValue = parsedValue;
-        if (parsedValue < minValue) finalValue = minValue;
-        if (parsedValue > maxValue) finalValue = maxValue;
+        let finalValue = parsedValue!;
+        if (parsedValue! < minValue) finalValue = minValue;
+        if (parsedValue! > maxValue) finalValue = maxValue;
 
-        // // Округляем если нужно
-        // if (!allowDecimal) {
-        //     finalValue = Math.round(finalValue);
-        // } else {
-        //     finalValue = Math.round(finalValue * 100) / 100;
-        // }
-
-        // Обновляем значение
-        if (value === undefined) {
-            setLocalValue(finalValue);
-            // Обновляем немедленное значение с отформатированной строкой
-            setUnDebouncedInputString(finalValue.toString());
-        }
+        setLocalValue(finalValue);
+        setUnDebouncedInputString(finalValue.toString());
         onChange && onChange(finalValue);
 
     }, [debouncedInputString]);
+
 
     const handleIncrement = () => {
         const newValue = Number(unDebouncedInputString) + stepBy;
@@ -154,18 +133,41 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
 
         const newInputString = e.target.value;
 
-        // Обновляем немедленное значение для отображения
-        setUnDebouncedInputString(newInputString);
+        // Фильтруем ввод на уровне обработчика
+        let filteredValue = newInputString;
 
+        if (!allowDecimal) {
+            // Только цифры
+            filteredValue = newInputString.replace(/[^\d]/g, '');
+        } else {
+            // Цифры и точка
+            // Удаляем все нецифры и не точки
+            filteredValue = newInputString.replace(/[^\d.]/g, '');
+
+            // Оставляем только первую точку
+            const parts = filteredValue.split('.');
+            if (parts.length > 2) {
+                filteredValue = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Ограничиваем до 2 знаков после точки
+            if (filteredValue.includes('.')) {
+                const [integer, decimal] = filteredValue.split('.');
+                if (decimal && decimal.length > 2) {
+                    filteredValue = integer + '.' + decimal.substring(0, 2);
+                }
+            }
+        }
+        setLocalValue(Number(filteredValue));
         // Запускаем дебаунс для проверки
-        // setDebouncedInputString(newInputString);
+        setDebouncedInputString(filteredValue);
     };
 
     // Проверка на возможность увеличения/уменьшения (для disabled состояния кнопок)
-    const canIncrement = currentValue + stepBy <= maxValue;
-    const canDecrement = currentValue - stepBy >= minValue;
+    const canIncrement = localValue + stepBy <= maxValue;
+    const canDecrement = localValue - stepBy >= minValue;
 
-    const displayValue = isInputDisabled ? currentValue.toString() : unDebouncedInputString;
+    const displayValue = localValue.toString();
 
 
     return (

@@ -1,18 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function useBetterDebounce<T>(initialValue: T, delay: number) {
     const [value, setValue] = useState<T>(initialValue);
     const [debouncedValue, setDebouncedValue] = useState<T>(initialValue);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
+        // Очищаем предыдущий таймаут
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        // Устанавливаем новый таймаут
+        timeoutRef.current = setTimeout(() => {
             setDebouncedValue(value);
         }, delay);
 
+        // Очистка при размонтировании
         return () => {
-            clearTimeout(handler);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
         };
     }, [JSON.stringify(value), delay]);
 
-    return [debouncedValue, setDebouncedValue, value, setValue] as const;
+    return [debouncedValue, setValue, value, setDebouncedValue] as const;
 }
