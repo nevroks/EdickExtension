@@ -319,6 +319,29 @@ export class RegistrationService {
                     },
                   },
                 },
+                {
+                  id: 'summary',
+                  enabled: settings.summaryWidget,
+                  config: {
+                    layout: { width: 600, height: 500 },
+                    settings: {
+                      title: 'Сводка',
+                      searchable: false,
+                      symbolRequired: false,
+                      noGroup: false,
+                      fullscreenAllowed: true,
+                      isSymbolResettingWithGroup: false,
+                      useSymbolInTitle: false,
+                      pinnable: true,
+                    },
+                    menu: {
+                      icon: 'chart',
+                      label: 'Сводка EdickExt',
+                      order: 3,
+                      hint: 'Сводка по сделкам',
+                    },
+                  },
+                },
               ];
 
               // Фильтруем виджеты на основе настроек

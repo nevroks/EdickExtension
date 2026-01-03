@@ -1,0 +1,174 @@
+.container {
+  padding: 20px;
+  padding-top: 4px;
+  color: white;
+  border-radius: 8px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  --scrollbars-thumb-color: var(--pro-text-color);
+  --scrollbars-thumb-opacity: 0.2;
+  --scrollbars-thumb-hover-opacity: 0.32;
+  --scrollbars-thumb-active-opacity: 0.56;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.container:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.container::-webkit-scrollbar-thumb:active {
+  background-color: #000;
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.refreshing {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 12px;
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 0;
+  margin-bottom: 4px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+  padding: 4px 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  top: 1px;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tabActive {
+  color: rgba(100, 150, 255, 1);
+}
+.tabActive::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px; /* Толщина вашей линии */
+  background: linear-gradient(90deg, rgba(15, 92, 193, 0) -4.22%, #1374f4 30.78%, #116ade 65.78%, rgba(11, 68, 142, 0) 95.78%);
+}
+
+.tableContainer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+  position: relative;
+}
+
+.tableContainer::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.tableContainer:hover::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.tickerButton {
+  background: none;
+  border: none;
+  color: rgba(100, 150, 255, 1);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.tickerButton:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.totalTicker {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.profitPositive {
+  color: rgba(var(--pro-positive, 0, 200, 0), 1);
+  font-weight: 600;
+}
+
+.profitNegative {
+  color: rgba(var(--pro-negative, 244, 67, 54), 1);
+  font-weight: 600;
+}

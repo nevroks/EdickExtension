@@ -1,0 +1,90 @@
+.tableWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: white;
+  font-size: 13px;
+}
+
+.table thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tableHeader {
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+.tableHeader.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tableHeader.sortable:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sortIcon {
+  font-size: 10px;
+  opacity: 0.6;
+  display: inline-block;
+  min-width: 12px;
+}
+
+.tableRow {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.totalRow {
+  position: sticky;
+  top: 24px;
+  z-index: 9;
+  border-top: 2px solid rgba(25, 33, 40, 1);
+  border-bottom: 2px solid rgba(25, 33, 40, 1);
+}
+
+.totalRow td {
+  font-weight: 600;
+  position: relative;
+}
+
+.tableCell {
+  padding: 4px 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 24px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
