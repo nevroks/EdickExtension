@@ -11,6 +11,10 @@ import useTUsersServiceApi from '../shared/hooks/useTUsersServiceApi';
 import useTOperationsServiceApi from '../shared/hooks/useTOperationsServiceApi';
 import { useSessionStorageWatcher } from '../shared/hooks/useSessionStorageWatcher';
 import { TinkoffPriceMath } from '@/utils/helpers';
+import BidsAsksComponent from './components/BidsAsks';
+import ApplicationWidgetIcebergTab from './components/ApplicationWidgetIcebergTab';
+import ApplicationWidgetDelayedTab from './components/ApplicationWidgetDelayedTab';
+
 
 
 
@@ -161,7 +165,7 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
                             }}>
                             ≈
                             {showDifferenceIn === "percentage" ? dayPriceDifference.percentageDifference : dayPriceDifference.absoluteDifference}
-                            {showDifferenceIn === "percentage" ? "%" : "Rub"}
+                            {showDifferenceIn === "percentage" ? "%" : "₽"}
                         </p>
                     </div>
 
@@ -172,6 +176,9 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
                     </p>
                 }
 
+            </div>
+            <div className={styles['ApplicationWidget-bid-ask']}>
+                {orderBook && orderBook.asks.length > 0 && orderBook.bids.length > 0 && <BidsAsksComponent asks={orderBook.asks[0]} bids={orderBook.bids[0]} />}
             </div>
             <div className={styles['ApplicationWidget-content']}>
 
@@ -192,8 +199,16 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
                     }}
                     instrumentInfo={instrumentInfo!}
                 />}
-                {ApplicationWidgetMode === "iceberg" && figi && instrumentInfo && <div>Айсберг</div>}
-                {ApplicationWidgetMode === "delayed" && figi && instrumentInfo && <div>Отложенная</div>}
+                {ApplicationWidgetMode === "iceberg" && figi && instrumentInfo && <ApplicationWidgetIcebergTab limits={{
+                    up: orderBook!.limitUp,
+                    down: orderBook!.limitDown
+                }} />}
+                {ApplicationWidgetMode === "delayed" && figi && instrumentInfo && orderBook && <ApplicationWidgetDelayedTab
+                    lastPrice={orderBook!.lastPrice}
+                    limits={{
+                        up: orderBook!.limitUp,
+                        down: orderBook!.limitDown
+                    }} />}
             </div>
         </div>
     );

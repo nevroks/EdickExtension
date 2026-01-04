@@ -58,18 +58,15 @@ export type GetOrderBookRequest = {
     depth?: number,
     instrumentId: InstrumentIdType,
 }
-
+export type BidsAsks = {
+    price: TinkoffPrice
+    quantity: string
+}
 type GetOrderBookResponse = {
     figi: string
     depth: number
-    bids: {
-        price: TinkoffPrice
-        quantity: string
-    }[]
-    asks: {
-        price: TinkoffPrice
-        quantity: string
-    }[]
+    bids: BidsAsks[]
+    asks: BidsAsks[]
     lastPrice: TinkoffPrice,
     limitUp: TinkoffPrice,
     limitDown: TinkoffPrice

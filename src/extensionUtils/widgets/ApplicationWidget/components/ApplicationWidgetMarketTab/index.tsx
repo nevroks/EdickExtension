@@ -30,7 +30,7 @@ const ApplicationWidgetMarketTab = ({ price, instrumentInfo, dayPriceDifference 
                 <div className={styles['ApplicationWidgetMarketTab-actions-inputs']}>
                     <div className={styles['ApplicationWidgetMarketTab-actions-inputs-item']}>
                         <p>Цена исполнения</p>
-                        <CounterInput placeholder='Рыночная' isInputDisabled={true} additionalInputElement={<span>Rub</span>} startValue={1} minValue={1} maxValue={1000000} stepBy={100} />
+                        <CounterInput placeholder='Рыночная' isInputDisabled={true} additionalInputElement={<span>₽</span>} startValue={1} minValue={1} maxValue={1000000} stepBy={100} />
                     </div>
                     <div className={styles['ApplicationWidgetMarketTab-actions-inputs-item']}>
                         <p>Количество</p>

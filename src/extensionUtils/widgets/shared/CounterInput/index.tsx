@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ReactNode } from 'react';
+import React, { useEffect, useState, type DetailedHTMLProps, type InputHTMLAttributes, type ReactNode } from 'react';
 import styles from './style.module.css';
 import classNames from 'classnames';
 import useBetterDebounce from '@/utils/hooks/useBetterDebounce';
@@ -7,17 +7,18 @@ type CounterInputProps = {
     startValue: number
     minValue: number
     maxValue: number
-    stepBy: number,
+    stepBy?: number,
     value?: number
     onChange?: (value: number) => void
     placeholder?: string
     allowDecimal?: boolean;
-
+    additionalInputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
     additionalInputElement?: ReactNode
     isInputDisabled?: boolean
+    disabledButtons?: boolean
 }
 
-const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange, placeholder, additionalInputElement, isInputDisabled = false, allowDecimal = false }: CounterInputProps) => {
+const CounterInput = ({ startValue, minValue, maxValue, disabledButtons = false, stepBy = 0, value, onChange, placeholder, additionalInputElement, isInputDisabled = false, allowDecimal = false, additionalInputProps }: CounterInputProps) => {
     const [localValue, setLocalValue] = useState(() => {
         const initialValue = startValue < minValue ? minValue : startValue > maxValue ? maxValue : startValue
         return initialValue
@@ -77,6 +78,7 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
         if (newValue < minValue) {
             if (value === undefined) {
                 setUnDebouncedInputString(minValue.toString());
+                setLocalValue(minValue);
             }
             onChange && onChange(minValue);
         }
@@ -91,13 +93,17 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             // Устанавливаем ограниченное значение
             if (value === undefined) {
                 setUnDebouncedInputString(finalValue.toString());
+
             }
+            setLocalValue(finalValue);
             onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
                 setUnDebouncedInputString(newValue.toString());
+
             }
+            setLocalValue(newValue);
             onChange && onChange(newValue);
         }
     }
@@ -117,12 +123,14 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
             if (value === undefined) {
                 setUnDebouncedInputString(finalValue.toString());
             }
+            setLocalValue(finalValue);
             onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
                 setUnDebouncedInputString(newValue.toString());
             }
+            setLocalValue(newValue);
             onChange && onChange(newValue);
         }
     }
@@ -176,6 +184,7 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
                 [styles['CounterInput-input-disabled']]: isInputDisabled
             })}>
                 <input
+                    {...additionalInputProps}
                     disabled={isInputDisabled}
                     className={styles['CounterInput-input-value']}
                     placeholder={placeholder}
@@ -190,14 +199,14 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
                 </div>}
 
             </div>
-            <div className={styles['CounterInput-buttons']}>
+            {!disabledButtons && <div className={styles['CounterInput-buttons']}>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-increment'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canIncrement || isInputDisabled,
                 })} disabled={!canIncrement || isInputDisabled} onClick={handleIncrement}>+</button>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-decrement'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canDecrement || isInputDisabled
                 })} disabled={!canDecrement || isInputDisabled} onClick={handleDecrement}>-</button>
-            </div>
+            </div>}
         </div>
     );
 }

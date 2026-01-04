@@ -1,0 +1,38 @@
+.ApplicationWidget-bid-ask {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.ApplicationWidget-bid-ask-values {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ApplicationWidget-bid-ask-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+
+.ApplicationWidget-bid-ask-progress {
+    display: flex;
+    flex: 1;
+    height: 4px;
+    flex-direction: row;
+}
+
+.ApplicationWidget-bid-ask-progress-line-bid {
+    height: 4px;
+    background: rgb(44, 232, 156);
+}
+
+.ApplicationWidget-bid-ask-progress-line-ask {
+    height: 4px;
+    background: rgb(255, 105, 105);
+}

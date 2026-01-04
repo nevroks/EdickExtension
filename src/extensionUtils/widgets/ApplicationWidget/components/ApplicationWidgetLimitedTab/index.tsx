@@ -30,7 +30,7 @@ const ApplicationWidgetLimitedTab = ({ instrumentInfo, limits }: ApplicationWidg
           allowDecimal={true}
           value={inputValue.marketPrice}
           onChange={value => { setInputValue({ ...inputValue, marketPrice: value }) }}
-          additionalInputElement={<span>Rub</span>}
+          additionalInputElement={<span>₽</span>}
           startValue={0}
           minValue={TinkoffPriceMath.toNumber(limits.down)}
           maxValue={TinkoffPriceMath.toNumber(limits.up)}

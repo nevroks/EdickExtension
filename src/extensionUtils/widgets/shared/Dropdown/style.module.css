@@ -1,0 +1,132 @@
+.Dropdown-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.DropdownMenuItem {
+    background-color: #21313f;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.DropdownMenuItem:hover {
+    background-color: #334657;
+}
+
+.DropdownMenuItem.selected {
+    background-color: #3879f2;
+    color: white;
+}
+
+/* <=====Dropdown button styles=====> */
+.DropdownButton {
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 6px;
+    background: rgba(44, 62, 77, 1);
+    transition: all 0.3s ease-in-out;
+}
+
+.DropdownButton:hover {
+    background-color: #334657;
+}
+
+.DropdownButton-content {
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+}
+
+.DropdownButton-text {
+    /* color: var(--Text-White-1000-color); */
+    color: white;
+    margin: 0;
+}
+
+.DropdownButton-text.unselected {
+    /* color: var(--Text-Black-600-color); */
+}
+
+.DropdownButton-arrow {
+    transform: rotate(0deg);
+    transition: all 0.3s;
+    justify-self: flex-end;
+}
+
+.DropdownButton.active .DropdownButton-arrow {
+    transform: rotate(180deg);
+}
+
+/* <=====Dropdown button styles=====> */
+
+/* <=====Dropdown menu styles=====> */
+.DropdownMenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    flex-direction: column;
+    width: 100%;
+    z-index: 100;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(120, 120, 120, 0.2);
+    border-radius: 6px;
+    z-index: 1001;
+    /* overflow-y: auto; */
+}
+
+.DropdownMenu.opened {
+    display: flex;
+    border-color: #007bff;
+    z-index: 2000;
+}
+
+/* Стили для скроллбара в WebKit-браузерах (Chrome, Safari, Edge) */
+.DropdownMenu::-webkit-scrollbar {
+    width: 8px;
+    /* Ширина скроллбара */
+}
+
+.DropdownMenu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Цвет трека */
+    border-radius: 4px;
+    /* Скругление углов трека */
+}
+
+.DropdownMenu::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Цвет ползунка */
+    border-radius: 4px;
+    /* Скругление углов ползунка */
+}
+
+.DropdownMenu::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Цвет ползунка при наведении */
+}
+
+/* Стили для скроллбара в Firefox */
+.DropdownMenu {
+    scrollbar-width: thin;
+    /* Тонкий скроллбар */
+    scrollbar-color: #888 #f1f1f1;
+    /* Цвет ползунка и трека */
+}
+
+.DropdownMenu.animationGoing {
+    overflow: hidden;
+}
+
+/* <=====Dropdown menu styles=====> */

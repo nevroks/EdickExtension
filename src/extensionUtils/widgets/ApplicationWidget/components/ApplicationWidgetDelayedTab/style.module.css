@@ -1,0 +1,75 @@
+.ApplicationWidgetDelayedTab-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 9px;
+    padding: 0px 24px;
+}
+
+.ApplicationWidgetDelayedTab-nav-item {
+    color: rgba(142, 169, 191, 1);
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5px 9px;
+    height: 24px;
+    border: 1px solid rgba(57, 75, 91, 1);
+    border-radius: 6px;
+
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.ApplicationWidgetDelayedTab-nav-item p {
+    font-size: 14px;
+    font-weight: 500;
+    /* стиль тинька */
+    margin: 0;
+}
+
+.ApplicationWidgetDelayedTab-nav-item.active {
+    border: 1px solid rgba(19, 116, 244, 1);
+}
+
+.ApplicationWidgetDelayedTab-content {
+    padding: 0 13px;
+}
+
+.TakeProfitTabComponent {}
+
+.TakeProfitTabComponent-fields,
+.StopLossTabComponent-fields,
+.TrailingStopTabComponent-fields {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    row-gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 18px;
+}
+
+.TrailingStopTabComponent-fields-item-input {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    align-items: center;
+    column-gap: 3px;
+}
+
+.TrailingStopTabComponent-fields-item-input-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0px 6px 6px 0px;
+    background: rgba(44, 62, 77, 1);
+    width: 32px;
+    height: 34px;
+    
+    /* стиль тинька */
+    border: none;
+    
+    
+    color: rgba(98, 131, 159, 1);
+    font-size: 15px;
+    font-weight: 500;
+}

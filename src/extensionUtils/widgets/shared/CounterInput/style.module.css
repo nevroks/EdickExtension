@@ -13,13 +13,23 @@
     grid-template-columns: 1fr 30px;
     align-items: center;
     border-radius: 6px 0px 0px 6px;
-    background: rgba(44, 62, 77, 1);
+    background: rgb(59, 83, 103);
     padding: 0 9px;
     height: 34px;
+
+    transition: all 0.2s ease;
+}
+
+.CounterInput-input:focus {
+    background-color: rgb(44, 62, 77);
 }
 
 .CounterInput-input-disabled {
-    background: rgba(30, 39, 47, 1);
+    background: rgb(30, 39, 47);
+}
+
+.CounterInput-input-disabled::placeholder {
+    color: rgba(98, 131, 159, 1);
 }
 
 .CounterInput-input-value {
@@ -27,6 +37,9 @@
     background: transparent;
     border: none;
     color: white;
+
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .CounterInput-input-value::placeholder {

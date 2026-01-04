@@ -1,0 +1,28 @@
+.Calendar-input {
+    width: 100%;
+    color: white;
+    height: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    padding: 0 8px;
+    background: #2C3E4D;
+    border: none;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 18px;
+
+    transition: all 0.2s ease;
+}
+.Calendar-input.error {
+    border: 1px solid #9D2B2B;
+}
+.Calendar-input::placeholder {
+    color: rgba(98, 131, 159, 1);
+}
+
+.Calendar-input:focus {
+    background-color: #24323F;
+}
