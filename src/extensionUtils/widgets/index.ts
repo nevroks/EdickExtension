@@ -2,6 +2,7 @@ import type { WidgetConfig } from '../extensionTypes';
 import ApplicationWidget, { type ApplicationWidgetProps } from './ApplicationWidget';
 import { BondAnalyzerWidget, type BondAnalyzerWidgetProps } from './BondAnalyzerWidget/BondAnalyzerWidget';
 import { NewsWidget, type NewsWidgetProps } from './NewsWidget/NewsWidget';
+import { SummaryWidget, type SummaryWidgetProps } from './SummaryWidget';
 
 
 type WidgetProps = Record<string, any>;
@@ -10,19 +11,21 @@ type WidgetProps = Record<string, any>;
 type WidgetComponent<P extends WidgetProps = WidgetProps> = (props: P) => React.ReactElement;
 
 // Union тип для идентификаторов виджетов
-export type WidgetId = 'bond-analyzer' | 'news' | 'application' | 'open-positions' | 'heat-maps' | 'large-limits' | 'sharp-changes' | 'ema' | 'marusya' | 'rsi' | 'pastuh' | 'robots';
+export type WidgetId = 'bond-analyzer' | 'news' | 'application' | 'summary' | 'open-positions' | 'heat-maps' | 'large-limits' | 'sharp-changes' | 'ema' | 'marusya' | 'rsi' | 'pastuh' | 'robots';
 
 export type widgetsRegistry = {
     'bond-analyzer': WidgetComponent<BondAnalyzerWidgetProps>,
     'news': WidgetComponent<NewsWidgetProps>,
     'application': WidgetComponent<ApplicationWidgetProps>,
+    'summary': WidgetComponent<SummaryWidgetProps>,
 }
 
 // Реестр всех доступных виджетов
 export const WIDGET_REGISTRY: widgetsRegistry = {
     'bond-analyzer': BondAnalyzerWidget,
     'news': NewsWidget,
-    'application': ApplicationWidget
+    'application': ApplicationWidget,
+    'summary': SummaryWidget,
     // 'portfolio-viewer': portfolioViewerWidget,
     // 'market-scanner': marketScannerWidget,
 };

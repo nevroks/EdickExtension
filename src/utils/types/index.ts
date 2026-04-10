@@ -1,5 +1,6 @@
 export type UserAppSettings = {
     newsWidget: boolean,
     robotsWidget: boolean,
-    pastuhWidget: boolean
+    pastuhWidget: boolean,
+    summaryWidget: boolean
 }

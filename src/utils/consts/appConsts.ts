@@ -1,4 +1,5 @@
 import type { WidgetId } from '@/extensionUtils/widgets';
+
 import type { UserAppSettings } from '../types';
 
 export const TINKOFF_API_URL = 'https://invest-public-api.tinkoff.ru/rest';
@@ -43,6 +44,11 @@ export const WIDGETS_CONFIG: Record<string, WidgetConfigItem> = {
     label: 'Пастухи виджет',
     defaultValue: true,
   },
+  summaryWidget: {
+    widgetId: 'summary',
+    label: 'Сводка виджет',
+    defaultValue: true,
+  },
   // Отключенные виджеты (не настраиваемые)
   rsiWidget: {
     widgetId: 'rsi',
@@ -81,7 +87,7 @@ export const WIDGETS_CONFIG: Record<string, WidgetConfigItem> = {
   },
 } as const;
 
-const ACTIVE_WIDGETS_CONFIG = Object.entries(WIDGETS_CONFIG).filter(([_, config]) => !config.disabled) as Array<[keyof UserAppSettings, WidgetConfigItem]>;
+const ACTIVE_WIDGETS_CONFIG = Object.entries(WIDGETS_CONFIG).filter(([, config]) => !config.disabled) as Array<[keyof UserAppSettings, WidgetConfigItem]>;
 
 export const defaultUserAppSettings: UserAppSettings = ACTIVE_WIDGETS_CONFIG.reduce((acc, [key, config]) => {
   if (config.defaultValue !== undefined) {
