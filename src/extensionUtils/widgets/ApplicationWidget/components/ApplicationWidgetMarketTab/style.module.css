@@ -1,9 +1,20 @@
-.ApplicationWidgetMarketTab-ticket-price-difference{
-    cursor: pointer;
-    color: rgb(44, 232, 156);
-    
-    transition: all 0.2s ease;
+.ApplicationWidgetMarketTab{
+    padding: 0 11px;
 }
-.ApplicationWidgetMarketTab-ticket-price-difference.negative{
-    color: rgb(255, 105, 105);
+.ApplicationWidgetMarketTab-actions-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+}
+.ApplicationWidgetMarketTab-actions-inputs-item{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    row-gap: 9px;
+}
+.ApplicationWidgetMarketTab-actions-prices{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
 }

@@ -1,39 +1,87 @@
-import React, { useEffect, useState, type ReactNode } from 'react';
+import React, { useEffect, useState, type DetailedHTMLProps, type InputHTMLAttributes, type ReactNode } from 'react';
 import styles from './style.module.css';
 import classNames from 'classnames';
+import useBetterDebounce from '@/utils/hooks/useBetterDebounce';
 
 type CounterInputProps = {
     startValue: number
     minValue: number
     maxValue: number
-    stepBy: number,
+    stepBy?: number,
     value?: number
     onChange?: (value: number) => void
     placeholder?: string
+    allowDecimal?: boolean;
+    additionalInputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
     additionalInputElement?: ReactNode
     isInputDisabled?: boolean
+    disabledButtons?: boolean
 }
 
-const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange, placeholder, additionalInputElement, isInputDisabled = false }: CounterInputProps) => {
-
-
+const CounterInput = ({ startValue, minValue, maxValue, disabledButtons = false, stepBy = 0, value, onChange, placeholder, additionalInputElement, isInputDisabled = false, allowDecimal = false, additionalInputProps }: CounterInputProps) => {
     const [localValue, setLocalValue] = useState(() => {
-        // Инициализируем с проверкой границ
-        const initial = startValue < minValue ? minValue : startValue > maxValue ? maxValue : startValue;
-        return initial;
+        const initialValue = startValue < minValue ? minValue : startValue > maxValue ? maxValue : startValue
+        return initialValue
     });
-    const currentValue = value !== undefined ? value : localValue;
-    // Обновляем локальное значение если пропсы изменились
+    // Используем дебаунс для строки ввода
+    const [debouncedInputString, setDebouncedInputString, unDebouncedInputString, setUnDebouncedInputString] = useBetterDebounce<string>(
+        localValue.toString(),
+        900
+    );
+
+    // Обработка дебаунсированного значения
     useEffect(() => {
-        if (value === undefined) {
-            const normalized = startValue < minValue ? minValue : startValue > maxValue ? maxValue : startValue;
-            setLocalValue(normalized);
+        if (debouncedInputString === '') {
+            // Пустая строка - устанавливаем 0
+            const finalValue = 0;
+            if (value === undefined) {
+                setLocalValue(finalValue);
+                setUnDebouncedInputString(finalValue.toString());
+            }
+            onChange && onChange(finalValue);
+            return;
         }
-    }, [startValue, minValue, maxValue, value]);
+
+        let parsedValue: number | null = null;
+        let isValid = false;
+
+        if (allowDecimal) {
+            // Для дробных чисел проверяем
+            const decimalRegex = /^\d+(\.\d{0,2})?$/;
+            if (decimalRegex.test(debouncedInputString)) {
+                parsedValue = parseFloat(debouncedInputString);
+                isValid = !isNaN(parsedValue);
+            }
+        } else {
+            // Для целых чисел проверяем
+            if (/^\d+$/.test(debouncedInputString)) {
+                parsedValue = parseInt(debouncedInputString, 10);
+                isValid = !isNaN(parsedValue);
+            }
+        }
+
+
+        // Проверяем границы
+        let finalValue = parsedValue!;
+        if (parsedValue! < minValue) finalValue = minValue;
+        if (parsedValue! > maxValue) finalValue = maxValue;
+
+        setLocalValue(finalValue);
+        setUnDebouncedInputString(finalValue.toString());
+        onChange && onChange(finalValue);
+
+    }, [debouncedInputString]);
+
 
     const handleIncrement = () => {
-        const newValue = currentValue + stepBy;
-
+        const newValue = Number(unDebouncedInputString) + stepBy;
+        if (newValue < minValue) {
+            if (value === undefined) {
+                setUnDebouncedInputString(minValue.toString());
+                setLocalValue(minValue);
+            }
+            onChange && onChange(minValue);
+        }
         // Проверяем не превышает ли максимальное значение
         if (newValue > maxValue) {
             // Можно либо ограничить максимальным значением
@@ -44,20 +92,24 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
 
             // Устанавливаем ограниченное значение
             if (value === undefined) {
-                setLocalValue(finalValue);
+                setUnDebouncedInputString(finalValue.toString());
+
             }
+            setLocalValue(finalValue);
             onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
-                setLocalValue(newValue);
+                setUnDebouncedInputString(newValue.toString());
+
             }
+            setLocalValue(newValue);
             onChange && onChange(newValue);
         }
     }
 
     const handleDecrement = () => {
-        const newValue = currentValue - stepBy;
+        const newValue = Number(unDebouncedInputString) - stepBy;
 
         // Проверяем не меньше ли минимального значения
         if (newValue < minValue) {
@@ -69,14 +121,16 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
 
             // Устанавливаем ограниченное значение
             if (value === undefined) {
-                setLocalValue(finalValue);
+                setUnDebouncedInputString(finalValue.toString());
             }
+            setLocalValue(finalValue);
             onChange && onChange(finalValue);
         } else {
             // В пределах диапазона - устанавливаем новое значение
             if (value === undefined) {
-                setLocalValue(newValue);
+                setUnDebouncedInputString(newValue.toString());
             }
+            setLocalValue(newValue);
             onChange && onChange(newValue);
         }
     }
@@ -84,32 +138,45 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
     // Обработчик прямого ввода в инпут
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (isInputDisabled) return;
-        
-        const inputValue = e.target.value;
 
-        // Проверяем, является ли ввод числом
-        if (inputValue === '' || /^-?\d*\.?\d*$/.test(inputValue)) {
-            const numValue = inputValue === '' ? 0 : parseFloat(inputValue);
+        const newInputString = e.target.value;
 
-            // Проверяем границы
-            let finalValue = numValue;
-            if (numValue < minValue) finalValue = minValue;
-            if (numValue > maxValue) finalValue = maxValue;
-            if (isNaN(numValue)) finalValue = minValue; // или currentValue
+        // Фильтруем ввод на уровне обработчика
+        let filteredValue = newInputString;
 
-            if (value === undefined) {
-                setLocalValue(finalValue);
+        if (!allowDecimal) {
+            // Только цифры
+            filteredValue = newInputString.replace(/[^\d]/g, '');
+        } else {
+            // Цифры и точка
+            // Удаляем все нецифры и не точки
+            filteredValue = newInputString.replace(/[^\d.]/g, '');
+
+            // Оставляем только первую точку
+            const parts = filteredValue.split('.');
+            if (parts.length > 2) {
+                filteredValue = parts[0] + '.' + parts.slice(1).join('');
             }
-            onChange && onChange(finalValue);
+
+            // Ограничиваем до 2 знаков после точки
+            if (filteredValue.includes('.')) {
+                const [integer, decimal] = filteredValue.split('.');
+                if (decimal && decimal.length > 2) {
+                    filteredValue = integer + '.' + decimal.substring(0, 2);
+                }
+            }
         }
-    }
+        setLocalValue(Number(filteredValue));
+        // Запускаем дебаунс для проверки
+        setDebouncedInputString(filteredValue);
+    };
 
     // Проверка на возможность увеличения/уменьшения (для disabled состояния кнопок)
-    const canIncrement = currentValue + stepBy <= maxValue;
-    const canDecrement = currentValue - stepBy >= minValue;
+    const canIncrement = localValue + stepBy <= maxValue;
+    const canDecrement = localValue - stepBy >= minValue;
 
-    // Округление для отображения (если stepBy целочисленный)
-    const displayValue = stepBy % 1 === 0 ? Math.round(currentValue) : currentValue;
+    const displayValue = localValue.toString();
+
 
     return (
         <div className={styles['CounterInput']}>
@@ -117,10 +184,12 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
                 [styles['CounterInput-input-disabled']]: isInputDisabled
             })}>
                 <input
+                    {...additionalInputProps}
+                    disabled={isInputDisabled}
                     className={styles['CounterInput-input-value']}
                     placeholder={placeholder}
                     type="text"
-                    value={displayValue}
+                    value={isInputDisabled ? undefined : displayValue}
                     onChange={handleInputChange}
                     min={minValue}
                     max={maxValue}
@@ -130,14 +199,14 @@ const CounterInput = ({ startValue, minValue, maxValue, stepBy, value, onChange,
                 </div>}
 
             </div>
-            <div className={styles['CounterInput-buttons']}>
+            {!disabledButtons && <div className={styles['CounterInput-buttons']}>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-increment'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canIncrement || isInputDisabled,
                 })} disabled={!canIncrement || isInputDisabled} onClick={handleIncrement}>+</button>
                 <button className={classNames(styles['CounterInput-buttons-button'], styles['CounterInput-buttons-button-decrement'], {
                     [styles['CounterInput-buttons-button-disabled']]: !canDecrement || isInputDisabled
                 })} disabled={!canDecrement || isInputDisabled} onClick={handleDecrement}>-</button>
-            </div>
+            </div>}
         </div>
     );
 }

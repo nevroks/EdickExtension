@@ -1,0 +1,63 @@
+.toggleContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.toggle {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: rgba(44, 62, 77, 1);
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.toggle:hover:not(.toggleDisabled) {
+    background: rgba(71, 98, 121, 1);
+}
+
+.toggle.toggleChecked {
+    background: rgba(0, 126, 244, 1);
+}
+
+.toggle.toggleChecked:hover:not(.toggleDisabled) {
+    background: rgba(0, 126, 244, 0.9);
+}
+
+.toggle.toggleDisabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(44, 62, 77, 0.5);
+}
+
+.toggle.toggleChecked.toggleDisabled {
+    background: rgba(0, 126, 244, 0.5);
+}
+
+.toggleIcon {
+    width: 10px;
+    height: 8px;
+}
+
+.toggleLabel {
+    color: rgba(170, 190, 209, 1);
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+}
+
+.toggleContainer:hover .toggle:not(.toggleDisabled) {
+    background: rgba(71, 98, 121, 1);
+}
+
+.toggleContainer:hover .toggle.toggleChecked:not(.toggleDisabled) {
+    background: rgba(0, 126, 244, 0.9);
+}

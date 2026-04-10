@@ -10,6 +10,11 @@ import type { TinkoffPrice } from '@/utils/api/tinkoffApi/TMarketDataServiceApi'
 import useTUsersServiceApi from '../shared/hooks/useTUsersServiceApi';
 import useTOperationsServiceApi from '../shared/hooks/useTOperationsServiceApi';
 import { useSessionStorageWatcher } from '../shared/hooks/useSessionStorageWatcher';
+import { TinkoffPriceMath } from '@/utils/helpers';
+import BidsAsksComponent from './components/BidsAsks';
+import ApplicationWidgetIcebergTab from './components/ApplicationWidgetIcebergTab';
+import ApplicationWidgetDelayedTab from './components/ApplicationWidgetDelayedTab';
+
 
 
 
@@ -44,83 +49,71 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
         accountId: string
         activeSpaceId: string
         activeSpaceStatus: string
-        balanceSettings:{
+        balanceSettings: {
             currency: string
             isDaily: boolean
         }
         strategyId: string
-        ui:{
+        ui: {
             isAddSpaceDialogShown: boolean
         }
     }>('nonShared');
 
     const [ApplicationWidgetMode, setApplicationWidgetMode] = useState<ApplicationWidgetMode>("market")
-
+    const [showDifferenceIn, setShowDifferenceIn] = useState<"percentage" | "currency">("currency")
     // console.log(figi);
     // console.log(assetUid);
 
 
 
-    const { queries: { getLastPrice, getClosePrices } } = useTMarketDataServiceApi()
+    const { queries: { getOrderBook, getClosePrices } } = useTMarketDataServiceApi()
     const { queries: { getInstrument } } = useTInstrumentsApi()
     const { queries: { getPortfolio } } = useTOperationsServiceApi()
 
-    
-    const { data: lastPrice } = getLastPrice({ instrumentId: [figi!] })
+
+    const { data: orderBook } = getOrderBook({ instrumentId: figi! })
     const { data: instrumentInfo } = getInstrument({ instrumentUid: figi! })
     const { data: closePrices } = getClosePrices({ instrumentId: [figi!] })
-    console.log("parsed:",parsedValue);
-    
+    // console.log("parsed:", parsedValue);
+
     const { data: portfolio } = getPortfolio({ accountId: parsedValue?.accountId! })
 
 
     const dayPriceDifference = useMemo(() => {
-        if (!lastPrice || !closePrices) {
+        if (!orderBook || !closePrices) {
             return {
                 percentageDifference: "0.00",
-                absoluteDifference: "0.00"
+                absoluteDifference: "0.00",
+                isPriceDifferenceNegative: false
             }
         }
-
-        // Конвертируем ВСЁ в нано (целые числа, без потери точности)
-        const toTotalNano = (price: TinkoffPrice): bigint => {
-            // Используем BigInt для больших чисел
-            const units = BigInt(price.units);
-            const nano = BigInt(price.nano);
-            return units * 1_000_000_000n + nano;
-        };
-
-        const currentTotalNano = toTotalNano({
-            units: lastPrice.lastPrices[0].price.units,
-            nano: lastPrice.lastPrices[0].price.nano
-        });
-
-        const previousTotalNano = toTotalNano({
-            units: closePrices.closePrices[0].eveningSessionPrice.units,
-            nano: closePrices.closePrices[0].eveningSessionPrice.nano
-        });
-
-        // Разница в нано (целое число, без потери точности)
-        const diffNano = currentTotalNano - previousTotalNano;
+        const diffNano = TinkoffPriceMath.subtract(
+            orderBook.lastPrice,
+            {
+                units: closePrices.closePrices[0].eveningSessionPrice.units,
+                nano: closePrices.closePrices[0].eveningSessionPrice.nano
+            }
+        )
 
         // 1. Абсолютная разница (переводим в число в конце)
-        const absoluteDifference = Number(diffNano) / 1_000_000_000;
+        const absoluteDifference = TinkoffPriceMath.toNumber(diffNano);
 
         // 2. Процентная разница (работаем с целыми числами до конца!)
-        // Формула: ((current - previous) / previous) * 100
-        // Умножаем на 10000 чтобы получить проценты с 2 знаками после запятой
-        const percentTimes10000 = Number(diffNano * 10_000n) / Number(previousTotalNano);
+        const percentTimes10000 = (absoluteDifference * 10000) / TinkoffPriceMath.toNumber(closePrices.closePrices[0].eveningSessionPrice);
 
         // Делим на 100 чтобы получить проценты
         const percentageDifference = percentTimes10000 / 100;
 
+        const isPriceDifferenceNegative = absoluteDifference.toFixed(2)[0] === "-";
+
         return {
+            isPriceDifferenceNegative: isPriceDifferenceNegative,
             percentageDifference: percentageDifference.toFixed(2),
             absoluteDifference: absoluteDifference.toFixed(2)
         }
 
-    }, [closePrices?.closePrices[0].eveningSessionPrice.nano, closePrices?.closePrices[0].eveningSessionPrice.units, lastPrice?.lastPrices[0].price.nano, lastPrice?.lastPrices[0].price.units])
-    console.log(portfolio);
+    }, [closePrices?.closePrices[0].eveningSessionPrice.nano, closePrices?.closePrices[0].eveningSessionPrice.units, orderBook?.lastPrice.nano, orderBook?.lastPrice.units])
+    // console.log(portfolio);
 
     // console.log(portfolio?.positions.forEach(position => {
     //     if (position.figi === figi) {
@@ -151,16 +144,71 @@ const ApplicationWidgetContent = ({ ticker, terminalWidgetId, figi, assetUid }: 
                     [styles['active']]: ApplicationWidgetMode === "delayed"
                 })}>Отложенная</p>
             </div>
+            <div className={styles['ApplicationWidget-ticket']}>
+                {instrumentInfo && orderBook ? <>
+                    <div className={styles['ApplicationWidget-ticket-name']}>
+                        <p>{instrumentInfo.instruments[0].name}</p>
+                        <p>Наличие в портфеле</p>
+                    </div>
+                    <div className={styles['ApplicationWidget-ticket-price']}>
+                        <p className={classNames(styles['ApplicationWidget-ticket-price-value'])}>{TinkoffPriceMath.toString(orderBook!.lastPrice)}&nbsp;₽</p>
+                        <p
+                            className={classNames(styles['ApplicationWidget-ticket-price-difference'], {
+                                [styles['negative']]: dayPriceDifference.isPriceDifferenceNegative
+                            })}
+                            onClick={() => {
+                                if (showDifferenceIn === "percentage") {
+                                    setShowDifferenceIn("currency")
+                                } else {
+                                    setShowDifferenceIn("percentage")
+                                }
+                            }}>
+                            ≈
+                            {showDifferenceIn === "percentage" ? dayPriceDifference.percentageDifference : dayPriceDifference.absoluteDifference}
+                            {showDifferenceIn === "percentage" ? "%" : "₽"}
+                        </p>
+                    </div>
+
+                </>
+                    :
+                    <p>
+                        Выберите инструмент
+                    </p>
+                }
+
+            </div>
+            <div className={styles['ApplicationWidget-bid-ask']}>
+                {orderBook && orderBook.asks.length > 0 && orderBook.bids.length > 0 && <BidsAsksComponent asks={orderBook.asks[0]} bids={orderBook.bids[0]} />}
+            </div>
             <div className={styles['ApplicationWidget-content']}>
-                {ApplicationWidgetMode === "market" && <ApplicationWidgetMarketTab
-                    instrumentInfo={instrumentInfo || null}
-                    price={lastPrice ? lastPrice.lastPrices[0].price : null}
+
+                {
+                    !figi && <div>Выберите инструмент</div>
+                }
+                {instrumentInfo && !instrumentInfo.instruments[0].apiTradeAvailableFlag && <p>Мы сожалеем, но тинькофф не позволяет торговать этим инструментом через веб терминал.</p>}
+                {ApplicationWidgetMode === "market" && figi && instrumentInfo && <ApplicationWidgetMarketTab
+                    instrumentInfo={instrumentInfo!}
+                    price={orderBook!.lastPrice}
                     dayPriceDifference={dayPriceDifference}
                 />
                 }
-                {ApplicationWidgetMode === "limited" && <ApplicationWidgetLimitedTab />}
-                {ApplicationWidgetMode === "iceberg" && <div>Айсберг</div>}
-                {ApplicationWidgetMode === "delayed" && <div>Отложенная</div>}
+                {ApplicationWidgetMode === "limited" && figi && instrumentInfo && <ApplicationWidgetLimitedTab
+                    limits={{
+                        up: orderBook!.limitUp,
+                        down: orderBook!.limitDown
+                    }}
+                    instrumentInfo={instrumentInfo!}
+                />}
+                {ApplicationWidgetMode === "iceberg" && figi && instrumentInfo && <ApplicationWidgetIcebergTab limits={{
+                    up: orderBook!.limitUp,
+                    down: orderBook!.limitDown
+                }} />}
+                {ApplicationWidgetMode === "delayed" && figi && instrumentInfo && orderBook && <ApplicationWidgetDelayedTab
+                    lastPrice={orderBook!.lastPrice}
+                    limits={{
+                        up: orderBook!.limitUp,
+                        down: orderBook!.limitDown
+                    }} />}
             </div>
         </div>
     );
